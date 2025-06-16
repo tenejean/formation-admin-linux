@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formation Administration Système Linux - Jour 7 : Permissions et droits</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            border-radius: 15px;
+            overflow: hidden;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
+            animation: float 20s infinite linear;
+        }
+
+        @keyframes float {
+            0% { transform: translateX(-50px) translateY(-50px); }
+            100% { transform: translateX(0px) translateY(0px); }
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header .subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .toc {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 40px;
+            border-left: 5px solid #3498db;
+        }
+
+        .toc h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .toc ol {
+            list-style: none;
+            counter-reset: toc-counter;
+        }
+
+        .toc li {
+            counter-increment: toc-counter;
+            margin-bottom: 8px;
+            padding-left: 30px;
+            position: relative;
+        }
+
+        .toc li::before {
+            content: counter(toc-counter);
+            position: absolute;
+            left: 0;
+            background: #3498db;
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        .section {
+            margin-bottom: 40px;
+            padding: 30px;
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            border-left: 4px solid #e74c3c;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .section:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+
+        .section h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 10px;
+        }
+
+        .section h3 {
+            color: #34495e;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .permissions-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .permissions-table th,
+        .permissions-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        .permissions-table th {
+            background: #34495e;
+            color: white;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.9em;
+            letter-spacing: 0.5px;
+        }
+
+        .permissions-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .code-block {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            overflow-x: auto;
+            position: relative;
+        }
+
+        .code-block::before {
+            content: '$ ';
+            color: #3498db;
+            font-weight: bold;
+        }
+
+        .inline-code {
+            background: #ecf0f1;
+            color: #2c3e50;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-left: 4px solid #fdcb6e;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+
+        .warning::before {
+            content: '⚠️ ';
+            font-weight: bold;
+        }
+
+        .info {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-left: 4px solid #28a745;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+
+        .info::before {
+            content: 'ℹ️ ';
+            font-weight: bold;
+        }
+
+        .exercise {
+            background: #e3f2fd;
+            border: 1px solid #bbdefb;
+            border-left: 4px solid #2196f3;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .exercise h4 {
+            color: #1976d2;
+            margin-bottom: 15px;
+        }
+
+        .exercise ol {
+            margin-left: 20px;
+        }
+
+        .exercise li {
+            margin-bottom: 8px;
+        }
+
+        ul, ol {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        li {
+            margin-bottom: 5px;
+        }
+
+        .best-practices {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin: 30px 0;
+        }
+
+        .best-practices h3 {
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .best-practices ul {
+            list-style-type: none;
+        }
+
+        .best-practices li {
+            padding-left: 25px;
+            position: relative;
+            margin-bottom: 10px;
+        }
+
+        .best-practices li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #2ecc71;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .footer {
+            background: #2c3e50;
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .footer h3 {
+            margin-bottom: 15px;
+            color: white;
+        }
+
+        .footer a {
+            color: #3498db;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 10px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .section {
+                padding: 20px;
+            }
+            
+            .permissions-table {
+                font-size: 0.9em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Formation Administration Système Linux</h1>
+            <div class="subtitle">Jour 7 : Permissions et droits</div>
+        </div>
+
+        <div class="content">
+            <div class="toc">
+                <h2>Sommaire</h2>
+                <ol>
+                    <li>Introduction aux permissions sous Linux</li>
+                    <li>Le système de permissions UNIX/Linux</li>
+                    <li>Types de permissions (r, w, x)</li>
+                    <li>Représentation numérique des permissions (notation octale)</li>
+                    <li>Propriété des fichiers et répertoires</li>
+                    <li>Modification des permissions (chmod)</li>
+                    <li>Modification des propriétaires (chown, chgrp)</li>
+                    <li>Permissions spéciales (SUID, SGID, Sticky bit)</li>
+                    <li>Permissions par défaut (umask)</li>
+                    <li>ACL (Access Control Lists)</li>
+                    <li>Exercices pratiques</li>
+                    <li>Résumé et bonnes pratiques</li>
+                </ol>
+            </div>
+
+            <div class="section">
+                <h2>1. Introduction aux permissions sous Linux</h2>
+                <p>Dans un système d'exploitation Linux, le contrôle d'accès aux fichiers et répertoires est un élément fondamental de la sécurité. Le système de permissions de Linux détermine qui peut lire, modifier ou exécuter chaque fichier ou répertoire du système.</p>
+                
+                <p>Un système de permissions bien configuré permet de :</p>
+                <ul>
+                    <li>Protéger les données sensibles</li>
+                    <li>Empêcher les modifications accidentelles de fichiers importants</li>
+                    <li>Séparer les espaces de travail entre utilisateurs</li>
+                    <li>Appliquer le principe du moindre privilège (chaque utilisateur ou processus ne dispose que des permissions minimales nécessaires)</li>
+                </ul>
+                
+                <p>Linux, étant un système multi-utilisateurs, nécessite un mécanisme robuste pour gérer ces accès et protéger les ressources.</p>
+            </div>
+
+            <div class="section">
+                <h2>2. Le système de permissions UNIX/Linux</h2>
+                <p>Le système de permissions sous Linux repose sur trois catégories d'utilisateurs :</p>
+                
+                <ol>
+                    <li><strong>Propriétaire (Owner)</strong> : L'utilisateur qui possède le fichier</li>
+                    <li><strong>Groupe (Group)</strong> : Le groupe auquel appartient le fichier</li>
+                    <li><strong>Autres (Others)</strong> : Tous les autres utilisateurs du système</li>
+                </ol>
+                
+                <p>Chaque fichier ou répertoire possède des permissions distinctes pour chacune de ces catégories.</p>
+                
+                <p>Pour visualiser les permissions d'un fichier, utilisez la commande <span class="inline-code">ls -l</span> :</p>
+                
+                <div class="code-block">ls -l exemple.txt<br>
+-rw-r--r-- 1 utilisateur groupe 1234 mai 15 14:30 exemple.txt</div>
+                
+                <p>Décortiquons cette sortie :</p>
+                <ul>
+                    <li>Le premier caractère indique le type de fichier (<span class="inline-code">-</span> pour un fichier régulier, <span class="inline-code">d</span> pour un répertoire)</li>
+                    <li>Les 9 caractères suivants représentent les permissions, divisés en 3 groupes de 3 caractères :
+                        <ul>
+                            <li>Les 3 premiers pour le propriétaire</li>
+                            <li>Les 3 suivants pour le groupe</li>
+                            <li>Les 3 derniers pour les autres utilisateurs</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <h2>3. Types de permissions (r, w, x)</h2>
+                <p>Il existe trois types de permissions de base :</p>
+                
+                <h3>r (read - lecture)</h3>
+                <ul>
+                    <li>Pour un fichier : permet de lire le contenu du fichier</li>
+                    <li>Pour un répertoire : permet de lister le contenu du répertoire</li>
+                </ul>
+                
+                <h3>w (write - écriture)</h3>
+                <ul>
+                    <li>Pour un fichier : permet de modifier le contenu du fichier</li>
+                    <li>Pour un répertoire : permet de créer, renommer ou supprimer des fichiers dans le répertoire</li>
+                </ul>
+                
+                <h3>x (execute - exécution)</h3>
+                <ul>
+                    <li>Pour un fichier : permet d'exécuter le fichier (s'il s'agit d'un programme ou d'un script)</li>
+                    <li>Pour un répertoire : permet d'accéder au répertoire (avec la commande <span class="inline-code">cd</span>)</li>
+                </ul>
+                
+                <div class="warning">
+                    <strong>Important :</strong> Les permissions sur les répertoires sont parfois contre-intuitives. En particulier :
+                    <ul>
+                        <li>L'absence de permission x sur un répertoire empêche tout accès à son contenu, même si vous avez les permissions r et w</li>
+                        <li>La permission w sans x sur un répertoire est rarement utile</li>
+                        <li>La permission typique pour naviguer dans un répertoire sans pouvoir y écrire est r-x</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>4. Représentation numérique des permissions (notation octale)</h2>
+                <p>Les permissions peuvent également être représentées sous forme numérique, dans un système octal (base 8). Cette méthode est souvent plus pratique pour définir des permissions.</p>
+                
+                <p>Chaque permission est associée à une valeur binaire :</p>
+                <ul>
+                    <li>r (read) = 4</li>
+                    <li>w (write) = 2</li>
+                    <li>x (execute) = 1</li>
+                </ul>
+                
+                <p>Les permissions pour chaque catégorie (propriétaire, groupe, autres) sont calculées en additionnant ces valeurs :</p>
+                
+                <table class="permissions-table">
+                    <thead>
+                        <tr>
+                            <th>Permissions</th>
+                            <th>Binaire</th>
+                            <th>Octal</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>---</td><td>000</td><td>0</td><td>Aucune permission</td></tr>
+                        <tr><td>--x</td><td>001</td><td>1</td><td>Exécution uniquement</td></tr>
+                        <tr><td>-w-</td><td>010</td><td>2</td><td>Écriture uniquement</td></tr>
+                        <tr><td>-wx</td><td>011</td><td>3</td><td>Écriture et exécution</td></tr>
+                        <tr><td>r--</td><td>100</td><td>4</td><td>Lecture uniquement</td></tr>
+                        <tr><td>r-x</td><td>101</td><td>5</td><td>Lecture et exécution</td></tr>
+                        <tr><td>rw-</td><td>110</td><td>6</td><td>Lecture et écriture</td></tr>
+                        <tr><td>rwx</td><td>111</td><td>7</td><td>Toutes les permissions</td></tr>
+                    </tbody>
+                </table>
+                
+                <h3>Exemples courants :</h3>
+                <ul>
+                    <li><strong>755</strong> : rwxr-xr-x (propriétaire : tout, groupe et autres : lecture et exécution)</li>
+                    <li><strong>644</strong> : rw-r--r-- (propriétaire : lecture et écriture, groupe et autres : lecture seule)</li>
+                    <li><strong>700</strong> : rwx------ (propriétaire : tout, groupe et autres : aucun accès)</li>
+                    <li><strong>777</strong> : rwxrwxrwx (accès total pour tous - généralement à éviter pour des raisons de sécurité)</li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <h2>5. Propriété des fichiers et répertoires</h2>
+                <p>Chaque fichier ou répertoire sous Linux appartient à :</p>
+                <ul>
+                    <li>Un utilisateur (propriétaire)</li>
+                    <li>Un groupe</li>
+                </ul>
+                
+                <p>Lors de la création d'un fichier, le système attribue automatiquement :</p>
+                <ul>
+                    <li>L'utilisateur créateur comme propriétaire</li>
+                    <li>Le groupe principal de cet utilisateur comme groupe du fichier</li>
+                </ul>
+                
+                <p>Pour voir le propriétaire et le groupe d'un fichier :</p>
+                <div class="code-block">ls -l fichier.txt<br>
+-rw-r--r-- 1 utilisateur groupe 1234 mai 15 14:30 fichier.txt</div>
+                
+                <p>Dans cet exemple :</p>
+                <ul>
+                    <li><span class="inline-code">utilisateur</span> est le propriétaire du fichier</li>
+                    <li><span class="inline-code">groupe</span> est le groupe auquel appartient le fichier</li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <h2>6. Modification des permissions (chmod)</h2>
+                <p>La commande <span class="inline-code">chmod</span> (change mode) permet de modifier les permissions d'un fichier ou d'un répertoire.</p>
+                
+                <h3>Syntaxe de base :</h3>
+                <div class="code-block">chmod [options] mode fichier</div>
+                
+                <h3>Utilisation avec la notation octale :</h3>
+                <div class="code-block">chmod 644 fichier.txt # rw-r--r--<br>
+chmod 755 script.sh # rwxr-xr-x<br>
+chmod 600 cle_privee.pem # rw-------</div>
+                
+                <h3>Utilisation avec la notation symbolique :</h3>
+                <p>La notation symbolique permet de modifier des permissions spécifiques sans affecter les autres.</p>
+                
+                <p>Symboles utilisés :</p>
+                <ul>
+                    <li><strong>u</strong> : user (propriétaire)</li>
+                    <li><strong>g</strong> : group (groupe)</li>
+                    <li><strong>o</strong> : others (autres)</li>
+                    <li><strong>a</strong> : all (tous)</li>
+                </ul>
+                
+                <ul>
+                    <li><strong>+</strong> : ajouter une permission</li>
+                    <li><strong>-</strong> : retirer une permission</li>
+                    <li><strong>=</strong> : définir exactement les permissions</li>
+                </ul>
+                
+                <div class="code-block">chmod u+x script.sh # Ajoute l'exécution pour le propriétaire<br>
+chmod g-w fichier.txt # Retire l'écriture pour le groupe<br>
+chmod o= fichier.txt # Retire toutes les permissions pour les autres<br>
+chmod a+r document.pdf # Ajoute la lecture pour tous</div>
+                
+                <h3>Options principales de chmod :</h3>
+                <ul>
+                    <li><strong>-R</strong> ou <strong>--recursive</strong> : Modifie récursivement les permissions des répertoires et de leur contenu</li>
+                    <li><strong>-v</strong> ou <strong>--verbose</strong> : Affiche un diagnostic pour chaque fichier traité</li>
+                </ul>
+                
+                <div class="code-block">chmod -R 755 dossier/ # Change les permissions de façon récursive</div>
+            </div>
+
+            <div class="section">
+                <h2>7. Modification des propriétaires (chown, chgrp)</h2>
+                
+                <h3>La commande chown (change owner)</h3>
+                <p><span class="inline-code">chown</span> permet de changer le propriétaire (et optionnellement le groupe) d'un fichier ou d'un répertoire.</p>
+                
+                <div class="code-block">chown nouvel_utilisateur fichier.txt<br>
+chown nouvel_utilisateur:nouveau_groupe fichier.txt</div>
+                
+                <h3>La commande chgrp (change group)</h3>
+                <p><span class="inline-code">chgrp</span> permet de changer uniquement le groupe d'un fichier ou d'un répertoire.</p>
+                
+                <div class="code-block">chgrp nouveau_groupe fichier.txt</div>
+                
+                <h3>Options principales :</h3>
+                <ul>
+                    <li><strong>-R</strong> ou <strong>--recursive</strong> : Modifie récursivement les propriétaires des répertoires et de leur contenu</li>
+                    <li><strong>-v</strong> ou <strong>--verbose</strong> : Affiche un diagnostic pour chaque fichier traité</li>
+                </ul>
+                
+                <div class="code-block">chown -R www-data:www-data /var/www/html/</div>
+                
+                <div class="warning">
+                    <strong>Important :</strong> Seul l'utilisateur root (ou via sudo) peut changer le propriétaire d'un fichier. Un utilisateur normal peut changer le groupe d'un fichier uniquement s'il en est le propriétaire et s'il est membre du nouveau groupe.
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>8. Permissions spéciales (SUID, SGID, Sticky bit)</h2>
+                <p>En plus des permissions standard, Linux offre trois permissions spéciales qui permettent de contrôler le comportement des fichiers et répertoires de façon plus avancée.</p>
+                
+                <h3>SUID (Set User ID) - 4000</h3>
+                <p>Quand il est appliqué à un exécutable, le SUID permet à l'utilisateur qui l'exécute d'hériter temporairement des permissions du propriétaire du fichier.</p>
+                <ul>
+                    <li>Représentation symbolique : <span class="inline-code">s</span> à la place du <span class="inline-code">x</span> dans les permissions du propriétaire (<span class="inline-code">rws</span>)</li>
+                    <li>Utilisation : <span class="inline-code">chmod u+s fichier</span> ou <span class="inline-code">chmod 4755 fichier</span></li>
+                    <li>Exemple : La commande <span class="inline-code">passwd</span> a le bit SUID activé car elle doit pouvoir modifier le fichier <span class="inline-code">/etc/shadow</span> qui appartient à root.</li>
+                </ul>
+                
+                <div class="code-block">ls -l /usr/bin/passwd<br>
+-rwsr-xr-x 1 root root 59640 mars 22 2019 /usr/bin/passwd</div>
+                
+                <h3>SGID (Set Group ID) - 2000</h3>
+                <ul>
+                    <li>Sur un fichier exécutable : l'utilisateur hérite temporairement des permissions du groupe du fichier</li>
+                    <li>Sur un répertoire : les nouveaux fichiers créés dans ce répertoire héritent du groupe du répertoire</li>
+                    <li>Représentation symbolique : <span class="inline-code">s</span> à la place du <span class="inline-code">x</span> dans les permissions du groupe (<span class="inline-code">r-s</span>)</li>
+                    <li>Utilisation : <span class="inline-code">chmod g+s fichier</span> ou <span class="inline-code">chmod 2755 fichier</span></li>
+                </ul>
+                
+                <div class="code-block">chmod g+s /shared/documents<br>
+ls -ld /shared/documents<br>
+drwxr-sr-x 2 admin team 4096 mai 15 15:42 /shared/documents</div>
+                
+                <h3>Sticky bit - 1000</h3>
+                <p>Quand il est appliqué à un répertoire, le sticky bit empêche les utilisateurs de supprimer ou renommer les fichiers qui ne leur appartiennent pas, même s'ils ont les permissions d'écriture sur le répertoire.</p>
+                <ul>
+                    <li>Représentation symbolique : <span class="inline-code">t</span> à la place du <span class="inline-code">x</span> dans les permissions des autres (<span class="inline-code">r-t</span>)</li>
+                    <li>Utilisation : <span class="inline-code">chmod o+t repertoire</span> ou <span class="inline-code">chmod 1755 repertoire</span></li>
+                    <li>Exemple : Le répertoire <span class="inline-code">/tmp</span> a généralement le sticky bit activé</li>
+                </ul>
+                
+                <div class="code-block">ls -ld /tmp<br>
+drwxrwxrwt 19 root root 4096 mai 15 16:03 /tmp</div>
+                
+                <h3>Combinaison des bits spéciaux</h3>
+                <p>Les bits spéciaux peuvent être combinés. En notation octale, on ajoute un quatrième chiffre au début :</p>
+                
+                <div class="code-block">chmod 1755 dossier # sticky bit + rwxr-xr-x<br>
+chmod 2755 dossier # SGID + rwxr-xr-x<br>
+chmod 4755 programme # SUID + rwxr-xr-x<br>
+chmod 7755 programme # SUID + SGID + sticky bit + rwxr-xr-x</div>
+            </div>
+
+            <div class="section">
+                <h2>9. Permissions par défaut (umask)</h2>
+                <p>Le <span class="inline-code">umask</span> (user mask) définit les permissions par défaut pour les nouveaux fichiers et répertoires créés par un utilisateur.</p>
+                
+                <p>Le umask est une valeur soustractive : il indique quelles permissions doivent être retirées des permissions maximales par défaut, qui sont :</p>
+                <ul>
+                    <li>666 (rw-rw-rw-) pour les fichiers</li>
+                    <li>777 (rwxrwxrwx) pour les répertoires</li>
+                </ul>
+                
+                <h3>Afficher le umask actuel :</h3>
+                <div class="code-block">umask<br>
+0022</div>
+                
+                <h3>Calcul des permissions par défaut :</h3>
+                <ul>
+                    <li>Pour les fichiers : 666 - umask = permissions par défaut</li>
+                    <li>Pour les répertoires : 777 - umask = permissions par défaut</li>
+                </ul>
+                
+                <h3>Exemple avec umask 022 :</h3>
+                <ul>
+                    <li>Fichiers : 666 - 022 = 644 (rw-r--r--)</li>
+                    <li>Répertoires : 777 - 022 = 755 (rwxr-xr-x)</li>
+                </ul>
+                
+                <h3>Modifier le umask pour la session actuelle :</h3>
+                <div class="code-block">umask 027 # Fichiers : 640, Répertoires : 750</div>
+                
+                <h3>Valeurs courantes de umask :</h3>
+                <ul>
+                    <li><strong>022</strong> : standard pour la plupart des systèmes (fichiers : 644, répertoires : 755)</li>
+                    <li><strong>027</strong> : plus restrictif, utile dans un environnement multi-utilisateurs (fichiers : 640, répertoires : 750)</li>
+                    <li><strong>077</strong> : très restrictif, aucun accès pour le groupe ou les autres (fichiers : 600, répertoires : 700)</li>
+                </ul>
+                
+                <p>Pour rendre un changement de umask permanent, ajoutez la commande à votre fichier <span class="inline-code">~/.bashrc</span> ou <span class="inline-code">~/.profile</span>.</p>
+            </div>
+
+            <div class="section">
+                <h2>10. ACL (Access Control Lists)</h2>
+                <p>Les listes de contrôle d'accès (ACL) offrent un contrôle plus fin des permissions que le système standard Unix. Elles permettent de définir des permissions pour des utilisateurs ou des groupes spécifiques, en plus du propriétaire, du groupe et des autres.</p>
+                
+                <h3>Installation des outils ACL</h3>
+                <p>Sur la plupart des distributions Linux, les outils ACL doivent être installés :</p>
+                
+                <div class="code-block"># Sur Debian/Ubuntu<br>
+sudo apt-get install acl<br><br>
+# Sur RHEL/CentOS/Fedora<br>
+sudo yum install acl</div>
+                
+                <h3>Vérifier si les ACL sont prises en charge</h3>
+                <div class="code-block">mount | grep "acl"</div>
+                
+                <p>Si "acl" n'apparaît pas dans la sortie, vous devrez peut-être monter la partition avec l'option acl :</p>
+                <div class="code-block">sudo mount -o remount,acl /</div>
+                
+                <h3>Commandes principales pour gérer les ACL</h3>
+                <ul>
+                    <li><strong>getfacl</strong> : Afficher les ACL d'un fichier</li>
+                    <li><strong>setfacl</strong> : Définir des ACL pour un fichier</li>
+                </ul>
+                
+                <h3>Exemples d'utilisation</h3>
+                
+                <h4>Afficher les ACL existantes :</h4>
+                <div class="code-block">getfacl fichier.txt<br>
+# file: fichier.txt<br>
+# owner: utilisateur<br>
+# group: groupe<br>
+user::rw-<br>
+group::r--<br>
+other::r--</div>
+                
+                <h4>Ajouter des permissions pour un utilisateur spécifique :</h4>
+                <div class="code-block">setfacl -m u:jean:rw- fichier.txt</div>
+                
+                <h4>Ajouter des permissions pour un groupe spécifique :</h4>
+                <div class="code-block">setfacl -m g:dev:r-x fichier.txt</div>
+                
+                <h4>Définir des permissions par défaut pour un répertoire :</h4>
+                <div class="code-block">setfacl -d -m u:jean:rwx projet/</div>
+                
+                <h4>Supprimer toutes les ACL d'un fichier :</h4>
+                <div class="code-block">setfacl -b fichier.txt</div>
+                
+                <h4>Appliquer des ACL de façon récursive :</h4>
+                <div class="code-block">setfacl -R -m u:jean:rwx projet/</div>
+                
+                <h3>Symboles indiquant la présence d'ACL</h3>
+                <p>Lorsqu'un fichier possède des ACL, la commande <span class="inline-code">ls -l</span> affiche un <span class="inline-code">+</span> à la fin des permissions standard :</p>
+                
+                <div class="code-block">ls -l fichier.txt<br>
+-rw-r--r--+ 1 utilisateur groupe 1234 mai 15 14:30 fichier.txt</div>
+            </div>
+
+            <div class="section">
+                <h2>11. Exercices pratiques</h2>
+                
+                <div class="exercise">
+                    <h4>Exercice 1 : Comprendre les permissions actuelles</h4>
+                    <ol>
+                        <li>Créez un répertoire nommé <span class="inline-code">test_permissions</span></li>
+                        <li>Dans ce répertoire, créez un fichier texte et un script shell</li>
+                        <li>Examinez les permissions par défaut de ces fichiers</li>
+                        <li>Notez la différence entre les permissions des fichiers et des répertoires</li>
+                    </ol>
+                    
+                    <div class="code-block">mkdir test_permissions<br>
+cd test_permissions<br>
+echo "Contenu du fichier" > fichier.txt<br>
+echo '#!/bin/bash' > script.sh<br>
+echo 'echo "Bonjour, monde!"' >> script.sh<br>
+ls -l</div>
+                </div>
+                
+                <div class="exercise">
+                    <h4>Exercice 2 : Modification des permissions</h4>
+                    <ol>
+                        <li>Modifiez les permissions du script pour le rendre exécutable par le propriétaire uniquement</li>
+                        <li>Modifiez les permissions du fichier texte pour qu'il soit en lecture seule pour tous</li>
+                        <li>Testez l'exécution du script et la modification du fichier texte</li>
+                    </ol>
+                    
+                    <div class="code-block">chmod u+x script.sh<br>
+chmod 444 fichier.txt<br>
+./script.sh<br>
+# Essayez de modifier fichier.txt</div>
+                </div>
+                
+                <div class="exercise">
+                    <h4>Exercice 3 : Utilisation des permissions spéciales</h4>
+                    <ol>
+                        <li>Créez un répertoire partagé avec le sticky bit</li>
+                        <li>Créez un répertoire avec le bit SGID</li>
+                        <li>Vérifiez les permissions et observez leur représentation</li>
+                    </ol>
+                    
+                    <div class="code-block">mkdir dossier_sticky<br>
+chmod 1777 dossier_sticky<br>
+mkdir dossier_sgid<br>
+chmod 2775 dossier_sgid<br>
+ls -ld dossier_*</div>
+                </div>
+                
+                <div class="exercise">
+                    <h4>Exercice 4 : Utilisation des ACL</h4>
+                    <ol>
+                        <li>Accordez des permissions spécifiques à un autre utilisateur sur un fichier</li>
+                        <li>Vérifiez les ACL du fichier</li>
+                        <li>Essayez d'accéder au fichier en tant que cet utilisateur</li>
+                    </ol>
+                    
+                    <div class="code-block">touch fichier_acl.txt<br>
+setfacl -m u:autreUtilisateur:rw- fichier_acl.txt<br>
+getfacl fichier_acl.txt<br>
+# Se connecter en tant qu'autreUtilisateur et tester l'accès</div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>12. Résumé et bonnes pratiques</h2>
+                
+                <h3>Points clés à retenir</h3>
+                <ol>
+                    <li>Le système de permissions Linux repose sur trois catégories : propriétaire, groupe, autres</li>
+                    <li>Trois types de permissions de base : lecture (r), écriture (w), exécution (x)</li>
+                    <li>Les permissions peuvent être représentées en notation symbolique ou octale</li>
+                    <li>Les commandes principales sont : <span class="inline-code">chmod</span>, <span class="inline-code">chown</span>, <span class="inline-code">chgrp</span></li>
+                    <li>Les permissions spéciales (SUID, SGID, sticky bit) offrent des fonctionnalités avancées</li>
+                    <li>Le umask définit les permissions par défaut</li>
+                    <li>Les ACL permettent un contrôle d'accès plus granulaire</li>
+                </ol>
+                
+                <div class="best-practices">
+                    <h3>Bonnes pratiques de sécurité</h3>
+                    <ul>
+                        <li>Principe du moindre privilège : N'accordez que les permissions minimales nécessaires</li>
+                        <li>Évitez les permissions 777 : N'accordez jamais toutes les permissions à tous les utilisateurs</li>
+                        <li>Utilisez des groupes : Organisez les utilisateurs en groupes pour simplifier la gestion des permissions</li>
+                        <li>Soyez prudent avec SUID/SGID : Ces bits peuvent représenter des risques de sécurité s'ils sont mal utilisés</li>
+                        <li>Vérifiez régulièrement les permissions : Auditez périodiquement les permissions des fichiers sensibles</li>
+                        <li>Définissez un umask restrictif : Configurez une valeur de umask appropriée pour votre environnement</li>
+                        <li>Utilisez les ACL avec parcimonie : Les ACL ajoutent de la complexité, utilisez-les uniquement lorsque nécessaire</li>
+                    </ul>
+                </div>
+                
+                <h3>Commandes utiles pour l'audit des permissions</h3>
+                
+                <div class="code-block"># Trouver les fichiers avec des permissions trop permissives<br>
+find / -type f -perm -0777 -print<br><br>
+# Trouver les fichiers avec SUID<br>
+find / -type f -perm -4000 -print<br><br>
+# Trouver les fichiers avec SGID<br>
+find / -type f -perm -2000 -print<br><br>
+# Vérifier les permissions des fichiers de configuration sensibles<br>
+ls -la /etc/passwd /etc/shadow /etc/group /etc/sudoers</div>
+                
+                <div class="info">
+                    <strong>Conclusion :</strong> La gestion des permissions et des droits sous Linux est un aspect fondamental de l'administration système. Une compréhension approfondie des mécanismes de contrôle d'accès permet de sécuriser efficacement un système tout en maintenant la flexibilité nécessaire pour les utilisateurs légitimes.
+                </div>
+                
+                <p>En maîtrisant les concepts et les commandes présentés dans ce cours, vous disposerez des outils nécessaires pour implémenter une politique de sécurité robuste adaptée à votre environnement.</p>
+            </div>
+        </div>
+
+        <div class="footer">
+            <h3>Références et ressources additionnelles</h3>
+            <ul style="list-style: none; text-align: left; max-width: 600px; margin: 0 auto;">
+                <li>• Man pages : <span class="inline-code">man chmod</span>, <span class="inline-code">man chown</span>, <span class="inline-code">man getfacl</span></li>
+                <li>• <a href="https://www.gnu.org/software/coreutils/" target="_blank">GNU Coreutils documentation</a></li>
+                <li>• <a href="https://tldp.org/LDP/intro-linux/html/sect_03_04.html" target="_blank">Linux Documentation Project</a></li>
+                <li>• <a href="https://www.vanemery.com/Linux/ACL/linux-acl.html" target="_blank">ACL HOWTO</a></li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formation Administration Système Linux - Jour 08</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            min-height: 100vh;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100"><polygon fill="rgba(255,255,255,0.1)" points="0,0 1000,0 1000,100 0,20"/></svg>');
+            background-size: cover;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .header h2 {
+            font-size: 1.5rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .content {
+            padding: 2rem;
+        }
+        
+        .objectives {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            border-left: 4px solid #3498db;
+        }
+        
+        .objectives h3 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+        
+        .objectives ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        
+        .objectives li {
+            padding: 0.3rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+        
+        .objectives li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #27ae60;
+            font-weight: bold;
+        }
+        
+        h1, h2, h3, h4 {
+            color: #2c3e50;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        h1 {
+            font-size: 2rem;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 0.5rem;
+        }
+        
+        h2 {
+            font-size: 1.5rem;
+            color: #34495e;
+        }
+        
+        h3 {
+            font-size: 1.3rem;
+            color: #4a5568;
+        }
+        
+        h4 {
+            font-size: 1.1rem;
+            color: #5a6c7d;
+        }
+        
+        .code-block {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            overflow-x: auto;
+            border-left: 4px solid #4299e1;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+        
+        .code-block .comment {
+            color: #68d391;
+            font-style: italic;
+        }
+        
+        .terminal {
+            background: #1a202c;
+            color: #00ff00;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            border: 2px solid #2d3748;
+        }
+        
+        .terminal::before {
+            content: '$ ';
+            color: #4299e1;
+            font-weight: bold;
+        }
+        
+        .info-box {
+            background: linear-gradient(135deg, #ebf8ff 0%, #bee3f8 100%);
+            border: 1px solid #90cdf4;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .warning-box {
+            background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+            border: 1px solid #f59e0b;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .package-manager {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .package-manager:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+        }
+        
+        .package-manager h4 {
+            color: #3182ce;
+            margin-top: 0;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 0.5rem;
+        }
+        
+        .quiz {
+            background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+            border-radius: 10px;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .quiz h2 {
+            color: #2d3748;
+            margin-bottom: 1rem;
+        }
+        
+        .quiz ol {
+            padding-left: 1.5rem;
+        }
+        
+        .quiz li {
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .references {
+            background: #2d3748;
+            color: white;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .references h2 {
+            color: #4299e1;
+            margin-bottom: 1rem;
+        }
+        
+        .references a {
+            color: #63b3ed;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 0.5rem;
+            transition: color 0.2s;
+        }
+        
+        .references a:hover {
+            color: #90cdf4;
+        }
+        
+        .toc {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .toc h3 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+        
+        .toc ul {
+            list-style-type: none;
+            padding-left: 1rem;
+        }
+        
+        .toc li {
+            margin-bottom: 0.3rem;
+        }
+        
+        .toc a {
+            color: #3498db;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        
+        .toc a:hover {
+            color: #2980b9;
+            text-decoration: underline;
+        }
+        
+        .exercise {
+            background: linear-gradient(135deg, #f0fff4 0%, #c6f6d5 100%);
+            border: 2px solid #48bb78;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+        
+        .exercise h4 {
+            color: #22543d;
+            margin-top: 0;
+        }
+        
+        .exercise ol {
+            padding-left: 1.5rem;
+        }
+        
+        .exercise li {
+            margin-bottom: 0.5rem;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                margin: 0;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .header h2 {
+                font-size: 1.2rem;
+            }
+            
+            .content {
+                padding: 1rem;
+            }
+            
+            .code-block, .terminal {
+                font-size: 0.8rem;
+                overflow-x: scroll;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Formation Administration Système Linux</h1>
+            <h2>Jour 08 - Installation de logiciels</h2>
+        </div>
+        
+        <div class="content">
+            <div class="objectives">
+                <h3>Objectifs du cours</h3>
+                <ul>
+                    <li>Comprendre les différents systèmes de gestion de paquets sous Linux</li>
+                    <li>Maîtriser l'installation, la mise à jour et la suppression de logiciels</li>
+                    <li>Connaître les méthodes alternatives d'installation</li>
+                    <li>Savoir gérer les dépendances et résoudre les problèmes courants</li>
+                    <li>Apprendre à compiler des programmes depuis les sources</li>
+                </ul>
+            </div>
+            
+            <div class="toc">
+                <h3>Table des matières</h3>
+                <ul>
+                    <li><a href="#intro">1. Introduction à la gestion des logiciels sous Linux</a></li>
+                    <li><a href="#systems">2. Les principaux systèmes de gestion de paquets</a></li>
+                    <li><a href="#apt">3. Installation de logiciels avec APT</a></li>
+                    <li><a href="#dnf">4. Installation de logiciels avec DNF/YUM</a></li>
+                    <li><a href="#pacman">5. Gestion des paquets avec Pacman</a></li>
+                    <li><a href="#universal">6. Systèmes de paquets universels</a></li>
+                    <li><a href="#sources">7. Installation depuis les sources</a></li>
+                    <li><a href="#dev-tools">8. Systèmes de gestion de versions pour développeurs</a></li>
+                    <li><a href="#best-practices">9. Bonnes pratiques et dépannage</a></li>
+                </ul>
+            </div>
+
+            <h1 id="intro">1. Introduction à la gestion des logiciels sous Linux</h1>
+            
+            <h2>1.1 Particularités de Linux pour la gestion logicielle</h2>
+            <p>Contrairement aux systèmes Windows où l'installation se fait généralement via des fichiers <code>.exe</code> ou <code>.msi</code>, Linux utilise des systèmes de gestion de paquets centralisés qui offrent plusieurs avantages :</p>
+            
+            <div class="info-box">
+                <ul>
+                    <li><strong>Centralisation :</strong> tous les logiciels sont disponibles depuis des dépôts centraux</li>
+                    <li><strong>Dépendances :</strong> gestion automatique des bibliothèques et composants requis</li>
+                    <li><strong>Mises à jour :</strong> système unifié de mise à jour pour tous les logiciels</li>
+                    <li><strong>Sécurité :</strong> vérification d'intégrité et d'authenticité des paquets</li>
+                    <li><strong>Désinstallation propre :</strong> suppression complète des composants installés</li>
+                </ul>
+            </div>
+            
+            <h2>1.2 Terminologie importante</h2>
+            <ul>
+                <li><strong>Paquet :</strong> archive contenant les fichiers d'un logiciel et ses métadonnées</li>
+                <li><strong>Dépendance :</strong> relation entre paquets où l'un nécessite l'autre pour fonctionner</li>
+                <li><strong>Dépôt :</strong> serveur contenant une collection de paquets disponibles à l'installation</li>
+                <li><strong>Gestionnaire de paquets :</strong> outil qui automatise l'installation, la mise à jour et la suppression des paquets</li>
+                <li><strong>Miroir :</strong> serveur qui duplique le contenu d'un dépôt officiel</li>
+            </ul>
+
+            <h1 id="systems">2. Les principaux systèmes de gestion de paquets</h1>
+            
+            <div class="package-manager">
+                <h2>2.1 Famille Debian (Debian, Ubuntu, Linux Mint...)</h2>
+                <h4>2.1.1 Système dpkg et APT</h4>
+                <ul>
+                    <li><strong>dpkg :</strong> utilitaire de bas niveau pour manipuler les paquets .deb</li>
+                    <li><strong>APT (Advanced Package Tool) :</strong> système de haut niveau qui gère les dépendances et les dépôts</li>
+                    <li><strong>apt :</strong> interface simplifiée et moderne remplaçant apt-get et apt-cache</li>
+                    <li><strong>aptitude :</strong> interface alternative à APT (mode texte ou ligne de commande)</li>
+                </ul>
+                
+                <h4>2.1.2 Structure d'un paquet .deb</h4>
+                <p>Archives au format ar contenant:</p>
+                <ul>
+                    <li><strong>debian-binary :</strong> version du format</li>
+                    <li><strong>control.tar.gz :</strong> métadonnées (dépendances, descriptions...)</li>
+                    <li><strong>data.tar.xz :</strong> fichiers à installer sur le système</li>
+                </ul>
+            </div>
+            
+            <div class="package-manager">
+                <h2>2.2 Famille Red Hat (RHEL, Fedora, CentOS...)</h2>
+                <h4>2.2.1 Système RPM et DNF/YUM</h4>
+                <ul>
+                    <li><strong>RPM (Red Hat Package Manager) :</strong> utilitaire de bas niveau pour les paquets .rpm</li>
+                    <li><strong>YUM (Yellowdog Updater Modified) :</strong> gestionnaire de haut niveau (plus ancien)</li>
+                    <li><strong>DNF (Dandified YUM) :</strong> remplaçant moderne de YUM (depuis Fedora 22 et RHEL 8)</li>
+                </ul>
+                
+                <h4>2.2.2 Structure d'un paquet .rpm</h4>
+                <p>Format binaire spécifique contenant:</p>
+                <ul>
+                    <li>En-tête (métadonnées)</li>
+                    <li>Archive compressée contenant les fichiers</li>
+                    <li>Scripts de pré/post installation</li>
+                </ul>
+            </div>
+            
+            <h2>2.3 Autres gestionnaires notables</h2>
+            <ul>
+                <li><strong>Pacman :</strong> utilisé par Arch Linux et dérivés</li>
+                <li><strong>Zypper :</strong> utilisé par SUSE et openSUSE</li>
+                <li><strong>Portage :</strong> système basé sur les sources pour Gentoo</li>
+                <li><strong>Alpine's apk :</strong> gestionnaire léger utilisé dans Alpine Linux</li>
+            </ul>
+            
+            <h2>2.4 Gestionnaires universels</h2>
+            <ul>
+                <li><strong>Flatpak :</strong> format de paquets indépendant des distributions</li>
+                <li><strong>Snap :</strong> système développé par Canonical (Ubuntu)</li>
+                <li><strong>AppImage :</strong> applications portables ne nécessitant pas d'installation</li>
+            </ul>
+
+            <h1 id="apt">3. Installation de logiciels avec APT (Debian/Ubuntu)</h1>
+            
+            <h2>3.1 Configuration des dépôts</h2>
+            <p>Les dépôts sont configurés dans les fichiers suivants :</p>
+            <ul>
+                <li><code>/etc/apt/sources.list</code> : dépôts principaux</li>
+                <li><code>/etc/apt/sources.list.d/</code> : dépôts additionnels (fichiers .list)</li>
+            </ul>
+            
+            <p>Structure d'une ligne de dépôt :</p>
+            <div class="code-block">
+deb [options] URI distribution composants
+            </div>
+            
+            <p>Exemple :</p>
+            <div class="code-block">
+deb http://archive.ubuntu.com/ubuntu/ jammy main restricted universe multiverse
+            </div>
+            
+            <h2>3.2 Mise à jour de la liste des paquets</h2>
+            <p>Cette commande synchronise les métadonnées des paquets disponibles avec les dépôts configurés.</p>
+            <div class="terminal">sudo apt update</div>
+            
+            <h2>3.3 Installation de logiciels</h2>
+            <div class="terminal">sudo apt install nom_du_paquet</div>
+            
+            <p>Options utiles :</p>
+            <ul>
+                <li><code>-y</code> : répondre automatiquement "oui" aux questions</li>
+                <li><code>--no-install-recommends</code> : ne pas installer les paquets recommandés</li>
+                <li><code>--reinstall</code> : réinstaller un paquet déjà installé</li>
+            </ul>
+            
+            <p>Installation de plusieurs paquets :</p>
+            <div class="terminal">sudo apt install paquet1 paquet2 paquet3</div>
+            
+            <h2>3.4 Mise à jour des logiciels</h2>
+            <p>Mettre à jour tous les paquets installés :</p>
+            <div class="terminal">sudo apt upgrade</div>
+            
+            <p>Mettre à jour la distribution (peut installer/supprimer des paquets) :</p>
+            <div class="terminal">sudo apt dist-upgrade</div>
+            <div class="code-block">
+<span class="comment"># ou la commande moderne équivalente</span>
+sudo apt full-upgrade
+            </div>
+            
+            <h2>3.5 Suppression de logiciels</h2>
+            <div class="code-block">
+<span class="comment"># Supprimer un paquet</span>
+sudo apt remove nom_du_paquet
+
+<span class="comment"># Supprimer un paquet et ses fichiers de configuration</span>
+sudo apt purge nom_du_paquet
+<span class="comment"># ou</span>
+sudo apt remove --purge nom_du_paquet
+
+<span class="comment"># Supprimer les paquets installés automatiquement et devenus inutiles</span>
+sudo apt autoremove
+            </div>
+            
+            <h2>3.6 Recherche de paquets</h2>
+            <div class="code-block">
+<span class="comment"># Rechercher dans les noms et descriptions</span>
+apt search terme_recherche
+
+<span class="comment"># Afficher les informations détaillées d'un paquet</span>
+apt show nom_du_paquet
+
+<span class="comment"># Lister les paquets installés</span>
+apt list --installed
+
+<span class="comment"># Lister les paquets pouvant être mis à jour</span>
+apt list --upgradable
+            </div>
+
+            <h1 id="dnf">4. Installation de logiciels avec DNF/YUM (RHEL/Fedora/CentOS)</h1>
+            
+            <h2>4.1 Configuration des dépôts</h2>
+            <p>Les dépôts sont configurés dans les fichiers suivants :</p>
+            <ul>
+                <li><code>/etc/yum.repos.d/</code> : répertoire contenant les fichiers .repo</li>
+            </ul>
+            
+            <p>Structure d'un fichier .repo :</p>
+            <div class="code-block">
+[id_du_depot]
+name=Description du dépôt
+baseurl=URL_du_dépôt
+enabled=1
+gpgcheck=1
+gpgkey=URL_de_la_clé_GPG
+            </div>
+            
+            <h2>4.2 Mise à jour de la liste des paquets</h2>
+            <p>Avec DNF, la mise à jour de la liste est automatique à chaque commande, mais peut être forcée :</p>
+            <div class="terminal">sudo dnf makecache</div>
+            
+            <h2>4.3 Installation de logiciels</h2>
+            <div class="terminal">sudo dnf install nom_du_paquet</div>
+            
+            <p>Options utiles :</p>
+            <ul>
+                <li><code>-y</code> : répondre automatiquement "oui" aux questions</li>
+                <li><code>--nogpgcheck</code> : ne pas vérifier les signatures GPG (déconseillé)</li>
+                <li><code>--refresh</code> : rafraîchir les métadonnées avant l'installation</li>
+            </ul>
+            
+            <h2>4.4 Mise à jour des logiciels</h2>
+            <div class="code-block">
+<span class="comment"># Mettre à jour tous les paquets</span>
+sudo dnf upgrade
+<span class="comment"># Alternative plus ancienne (YUM)</span>
+sudo yum update
+            </div>
+            
+            <h2>4.5 Suppression de logiciels</h2>
+            <div class="code-block">
+<span class="comment"># Supprimer un paquet</span>
+sudo dnf remove nom_du_paquet
+
+<span class="comment"># Supprimer les paquets devenus inutiles (dépendances orphelines)</span>
+sudo dnf autoremove
+            </div>
+            
+            <h2>4.6 Recherche de paquets</h2>
+            <div class="code-block">
+<span class="comment"># Rechercher dans les noms et descriptions</span>
+sudo dnf search terme_recherche
+
+<span class="comment"># Afficher les informations d'un paquet</span>
+sudo dnf info nom_du_paquet
+
+<span class="comment"># Lister les paquets installés</span>
+sudo dnf list installed
+
+<span class="comment"># Lister les paquets disponibles pour mise à jour</span>
+sudo dnf check-update
+            </div>
+            
+            <h2>4.7 Groupes de paquets</h2>
+            <p>DNF/YUM permet d'installer des ensembles prédéfinis de paquets :</p>
+            <div class="code-block">
+<span class="comment"># Lister les groupes disponibles</span>
+sudo dnf group list
+
+<span class="comment"># Installer un groupe</span>
+sudo dnf group install "Nom du groupe"
+            </div>
+
+            <h1 id="pacman">5. Gestion des paquets avec Pacman (Arch Linux)</h1>
+            
+            <h2>5.1 Mise à jour de la liste des paquets</h2>
+            <div class="terminal">sudo pacman -Sy</div>
+            
+            <h2>5.2 Installation de logiciels</h2>
+            <div class="terminal">sudo pacman -S nom_du_paquet</div>
+            
+            <h2>5.3 Mise à jour des logiciels</h2>
+            <div class="code-block">
+<span class="comment"># Synchroniser la base de données et mettre à jour tous les paquets</span>
+sudo pacman -Syu
+            </div>
+            
+            <h2>5.4 Suppression de logiciels</h2>
+            <div class="code-block">
+<span class="comment"># Supprimer un paquet</span>
+sudo pacman -R nom_du_paquet
+
+<span class="comment"># Supprimer un paquet et ses dépendances non utilisées par d'autres paquets</span>
+sudo pacman -Rs nom_du_paquet
+            </div>
+            
+            <h2>5.5 Recherche de paquets</h2>
+            <div class="code-block">
+<span class="comment"># Rechercher dans les noms et descriptions</span>
+sudo pacman -Ss terme_recherche
+
+<span class="comment"># Afficher les informations d'un paquet</span>
+sudo pacman -Si nom_du_paquet
+
+<span class="comment"># Lister les paquets installés</span>
+sudo pacman -Q
+            </div>
+
+            <h1 id="universal">6. Systèmes de paquets universels</h1>
+            
+            <h2>6.1 Flatpak</h2>
+            <p>Conçu pour fournir des applications isolées du système sous-jacent.</p>
+            <div class="code-block">
+<span class="comment"># Installation de Flatpak</span>
+sudo apt install flatpak <span class="comment"># Sur Debian/Ubuntu</span>
+sudo dnf install flatpak <span class="comment"># Sur Fedora</span>
+
+<span class="comment"># Ajouter le dépôt Flathub</span>
+flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+
+<span class="comment"># Installer une application</span>
+flatpak install flathub org.nom.Application
+
+<span class="comment"># Exécuter une application</span>
+flatpak run org.nom.Application
+
+<span class="comment"># Mettre à jour toutes les applications Flatpak</span>
+flatpak update
+
+<span class="comment"># Supprimer une application</span>
+flatpak uninstall org.nom.Application
+            </div>
+            
+            <h2>6.2 Snap</h2>
+            <p>Développé par Canonical, utilisé principalement sous Ubuntu.</p>
+            <div class="code-block">
+<span class="comment"># Installation de Snap (préinstallé sur Ubuntu)</span>
+sudo apt install snapd <span class="comment"># Sur Debian/Ubuntu</span>
+sudo dnf install snapd <span class="comment"># Sur Fedora</span>
+
+<span class="comment"># Installer une application</span>
+sudo snap install nom_application
+
+<span class="comment"># Lister les snaps installés</span>
+snap list
+
+<span class="comment"># Mettre à jour un snap</span>
+sudo snap refresh nom_application
+
+<span class="comment"># Mettre à jour tous les snaps</span>
+sudo snap refresh
+
+<span class="comment"># Supprimer un snap</span>
+sudo snap remove nom_application
+            </div>
+            
+            <h2>6.3 AppImage</h2>
+            <p>Applications autonomes qui ne nécessitent pas d'installation.</p>
+            <div class="info-box">
+                <p>Utilisation:</p>
+                <ol>
+                    <li>Télécharger le fichier AppImage</li>
+                    <li>Rendre le fichier exécutable: <code>chmod +x fichier.AppImage</code></li>
+                    <li>Exécuter: <code>./fichier.AppImage</code></li>
+                </ol>
+            </div>
+
+            <h1 id="sources">7. Installation depuis les sources</h1>
+            
+            <h2>7.1 Pourquoi compiler depuis les sources?</h2>
+            <ul>
+                <li>Logiciel non disponible dans les dépôts officiels</li>
+                <li>Besoin de personnalisation avancée</li>
+                <li>Optimisations spécifiques à votre matériel</li>
+                <li>Versions plus récentes que celles disponibles dans les dépôts</li>
+            </ul>
+            
+            <h2>7.2 Prérequis pour la compilation</h2>
+            <p>Installation des outils de développement nécessaires:</p>
+            
+            <p>Sur Debian/Ubuntu:</p>
+            <div class="terminal">sudo apt install build-essential autoconf automake libtool pkg-config</div>
+            
+            <p>Sur RHEL/Fedora/CentOS:</p>
+            <div class="terminal">sudo dnf group install "Development Tools"</div>
+            
+            <p>Sur Arch Linux:</p>
+            <div class="terminal">sudo pacman -S base-devel</div>
+            
+            <h2>7.3 Processus typique de compilation</h2>
+            <div class="code-block">
+<span class="comment"># 1. Télécharger et extraire les sources</span>
+wget https://example.com/logiciel-1.0.tar.gz
+tar xzf logiciel-1.0.tar.gz
+cd logiciel-1.0
+
+<span class="comment"># 2. Configurer (vérifie les dépendances et crée le Makefile)</span>
+./configure --prefix=/usr/local
+
+<span class="comment"># 3. Compiler</span>
+make
+
+<span class="comment"># 4. Installer</span>
+sudo make install
+            </div>
+            
+            <h2>7.4 Gestion des dépendances lors de la compilation</h2>
+            <p>Sur Debian/Ubuntu, installer les bibliothèques de développement:</p>
+            <div class="code-block">
+sudo apt install libxml2-dev libssl-dev <span class="comment"># exemple de dépendances courantes</span>
+            </div>
+            
+            <h2>7.5 Utilisation de checkinstall</h2>
+            <p>checkinstall crée un paquet système à partir d'une installation depuis les sources, facilitant la désinstallation ultérieure:</p>
+            <div class="code-block">
+sudo apt install checkinstall <span class="comment"># Sur Debian/Ubuntu</span>
+<span class="comment"># Au lieu de 'make install', utilisez:</span>
+sudo checkinstall
+            </div>
+
+            <h1 id="dev-tools">8. Systèmes de gestion de versions pour développeurs</h1>
+            
+            <h2>8.1 pip (Python)</h2>
+            <div class="code-block">
+<span class="comment"># Installation de pip</span>
+sudo apt install python3-pip <span class="comment"># Debian/Ubuntu</span>
+sudo dnf install python3-pip <span class="comment"># Fedora/RHEL</span>
+
+<span class="comment"># Installer un paquet Python</span>
+pip install nom_du_paquet
+
+<span class="comment"># Installer pour l'utilisateur courant uniquement</span>
+pip install --user nom_du_paquet
+
+<span class="comment"># Mettre à jour un paquet</span>
+pip install --upgrade nom_du_paquet
+
+<span class="comment"># Désinstaller un paquet</span>
+pip uninstall nom_du_paquet
+            </div>
+            
+            <h2>8.2 npm (Node.js)</h2>
+            <div class="code-block">
+<span class="comment"># Installation de Node.js et npm</span>
+sudo apt install nodejs npm <span class="comment"># Debian/Ubuntu</span>
+sudo dnf install nodejs npm <span class="comment"># Fedora/RHEL</span>
+
+<span class="comment"># Installer un paquet globalement</span>
+sudo npm install -g nom_du_paquet
+
+<span class="comment"># Installer en local (dans le projet)</span>
+npm install nom_du_paquet
+
+<span class="comment"># Mettre à jour un paquet</span>
+npm update nom_du_paquet
+
+<span class="comment"># Désinstaller un paquet</span>
+npm uninstall nom_du_paquet
+            </div>
+            
+            <h2>8.3 gem (Ruby)</h2>
+            <div class="code-block">
+<span class="comment"># Installation de Ruby et gem</span>
+sudo apt install ruby-full <span class="comment"># Debian/Ubuntu</span>
+sudo dnf install ruby <span class="comment"># Fedora/RHEL</span>
+
+<span class="comment"># Installer une gem</span>
+gem install nom_de_la_gem
+
+<span class="comment"># Mettre à jour toutes les gems</span>
+gem update
+
+<span class="comment"># Désinstaller une gem</span>
+gem uninstall nom_de_la_gem
+            </div>
+
+            <h1 id="best-practices">9. Bonnes pratiques et dépannage</h1>
+            
+            <h2>9.1 Bonnes pratiques</h2>
+            <div class="info-box">
+                <ul>
+                    <li>Privilégier les paquets des dépôts officiels quand c'est possible</li>
+                    <li>Mettre régulièrement à jour le système pour des raisons de sécurité</li>
+                    <li>Faire attention aux sources tierces (PPA, COPR, etc.)</li>
+                    <li>Documenter les installations manuelles et personnalisations</li>
+                    <li>Faire des sauvegardes avant les mises à jour majeures</li>
+                </ul>
+            </div>
+            
+            <h2>9.2 Résolution des dépendances brisées</h2>
+            <p>Sur Debian/Ubuntu:</p>
+            <div class="code-block">
+<span class="comment"># Réparer les paquets cassés</span>
+sudo apt --fix-broken install
+
+<span class="comment"># Forcer la reconfiguration des paquets</span>
+sudo dpkg --configure -a
+            </div>
+            
+            <p>Sur RHEL/Fedora/CentOS:</p>
+            <div class="code-block">
+<span class="comment"># Nettoyer les métadonnées et le cache</span>
+sudo dnf clean all
+            </div>
+            
+            <h2>9.3 Problèmes courants et solutions</h2>
+            
+            <div class="warning-box">
+                <h4>Erreur de verrouillage</h4>
+                <div class="code-block">
+<span class="comment"># Sur Debian/Ubuntu</span>
+sudo rm /var/lib/apt/lists/lock
+sudo rm /var/cache/apt/archives/lock
+sudo rm /var/lib/dpkg/lock*
+                </div>
+            </div>
+            
+            <div class="warning-box">
+                <h4>Conflit de paquets</h4>
+                <p>Examiner soigneusement les messages d'erreur et:</p>
+                <ol>
+                    <li>Désinstaller le paquet conflictuel</li>
+                    <li>Chercher une version alternative</li>
+                    <li>Utiliser des options de forçage (avec prudence)</li>
+                </ol>
+            </div>
+            
+            <div class="warning-box">
+                <h4>Corruption de la base de données de paquets</h4>
+                <div class="code-block">
+sudo apt clean
+sudo apt update --fix-missing
+                </div>
+            </div>
+
+            <h1>Activités pratiques</h1>
+            
+            <div class="exercise">
+                <h4>Exercice 1: Installation et gestion de logiciels</h4>
+                <ol>
+                    <li>Installez trois logiciels de votre choix à l'aide du gestionnaire de paquets</li>
+                    <li>Vérifiez la version installée de chaque logiciel</li>
+                    <li>Mettez à jour un des logiciels, si une mise à jour est disponible</li>
+                    <li>Désinstallez proprement l'un des logiciels</li>
+                </ol>
+            </div>
+            
+            <div class="exercise">
+                <h4>Exercice 2: Ajout d'un dépôt tiers</h4>
+                <ol>
+                    <li>Ajoutez un dépôt PPA (sur Ubuntu) ou équivalent pour votre distribution</li>
+                    <li>Mettez à jour la liste des paquets</li>
+                    <li>Installez un logiciel depuis ce dépôt</li>
+                    <li>Comparez les métadonnées du paquet avec celles d'un paquet des dépôts officiels</li>
+                </ol>
+            </div>
+            
+            <div class="exercise">
+                <h4>Exercice 3: Compilation depuis les sources</h4>
+                <ol>
+                    <li>Téléchargez les sources d'un petit projet open source</li>
+                    <li>Identifiez et installez les dépendances nécessaires</li>
+                    <li>Compilez et installez le logiciel</li>
+                    <li>Vérifiez que l'installation fonctionne correctement</li>
+                </ol>
+            </div>
+
+            <h1>Conclusion</h1>
+            <p>L'installation et la gestion des logiciels sont des compétences fondamentales pour tout administrateur système Linux. Les différentes distributions proposent des outils variés, mais reposant sur des principes similaires. La compréhension des systèmes de gestion de paquets permet non seulement d'installer les logiciels nécessaires, mais aussi de maintenir le système à jour et sécurisé. Dans le prochain cours, nous aborderons la gestion des processus et services, qui sont les composants actifs utilisant les logiciels installés.</p>
+
+            <div class="quiz">
+                <h2>Quiz de révision</h2>
+                <ol>
+                    <li>Quelles sont les principales différences entre les systèmes de paquets DEB et RPM?</li>
+                    <li>Comment mettre à jour la liste des paquets disponibles sous Ubuntu?</li>
+                    <li>Quelle commande permet d'installer un paquet sous CentOS/RHEL 8?</li>
+                    <li>Comment installer un logiciel et toutes ses dépendances depuis le code source?</li>
+                    <li>Quels sont les avantages des formats universels comme Flatpak et Snap?</li>
+                    <li>Comment résoudre un problème de dépendances brisées sous Debian/Ubuntu?</li>
+                    <li>Quelle est la différence entre <code>apt remove</code> et <code>apt purge</code>?</li>
+                    <li>Comment ajouter un nouveau dépôt sur un système basé sur RHEL?</li>
+                    <li>Quel outil permet de créer un paquet système à partir d'une installation depuis les sources?</li>
+                    <li>Comment installer un paquet Python pour l'utilisateur courant uniquement?</li>
+                </ol>
+            </div>
+        </div>
+        
+        <div class="references">
+            <h2>Références</h2>
+            <a href="https://wiki.debian.org/Apt" target="_blank">Documentation officielle de APT</a>
+            <a href="https://dnf.readthedocs.io/" target="_blank">Documentation officielle de DNF</a>
+            <a href="https://wiki.archlinux.org/index.php/Pacman" target="_blank">Documentation officielle de Pacman</a>
+            <a href="https://docs.flatpak.org/" target="_blank">Documentation Flatpak</a>
+            <a href="https://snapcraft.io/docs" target="_blank">Documentation Snap</a>
+            <a href="https://www.gnu.org/software/automake/manual/" target="_blank">GNU Autotools</a>
+            <a href="https://www.debian.org/doc/manuals/maint-guide/" target="_blank">Guide Debian des mainteneurs</a>
+        </div>
+    </div>
+</body>
+</html>

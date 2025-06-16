@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jour 20 - Tâches planifiées</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .nav {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .nav ul {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .nav a {
+            color: #667eea;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 25px;
+            background: white;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .nav a:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .section {
+            margin-bottom: 40px;
+            padding: 30px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+            border-left: 5px solid #667eea;
+        }
+        
+        .section h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 2em;
+            position: relative;
+            padding-bottom: 10px;
+        }
+        
+        .section h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 2px;
+        }
+        
+        .section h3 {
+            color: #764ba2;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+        }
+        
+        .code-block {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            margin: 15px 0;
+            overflow-x: auto;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border: 1px solid #4a5568;
+        }
+        
+        .code-block .comment {
+            color: #68d391;
+        }
+        
+        .code-block .command {
+            color: #63b3ed;
+            font-weight: bold;
+        }
+        
+        .warning {
+            background: linear-gradient(135deg, #fed7d7, #feb2b2);
+            border: 1px solid #fc8181;
+            color: #742a2a;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            font-weight: 500;
+        }
+        
+        .info {
+            background: linear-gradient(135deg, #bee3f8, #90cdf4);
+            border: 1px solid #63b3ed;
+            color: #2a4365;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            font-weight: 500;
+        }
+        
+        .success {
+            background: linear-gradient(135deg, #c6f6d5, #9ae6b4);
+            border: 1px solid #68d391;
+            color: #22543d;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            font-weight: 500;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        th {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            font-weight: 600;
+        }
+        
+        tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .exercise {
+            background: linear-gradient(135deg, #fef5e7, #fed7aa);
+            border: 2px solid #f6ad55;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+        
+        .exercise h4 {
+            color: #c05621;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-style: italic;
+        }
+        
+        @media (max-width: 768px) {
+            .nav ul {
+                flex-direction: column;
+            }
+            
+            .container {
+                margin: 10px;
+                padding: 15px;
+            }
+            
+            .section {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🕐 Jour 20 - Tâches planifiées</h1>
+            <p>Formation Administration Système Linux</p>
+            <p>Responsable : Jean Tene</p>
+        </div>
+        
+        <nav class="nav">
+            <ul>
+                <li><a href="#introduction">Introduction</a></li>
+                <li><a href="#cron">Cron</a></li>
+                <li><a href="#crontab">Crontab</a></li>
+                <li><a href="#at">Commande AT</a></li>
+                <li><a href="#anacron">Anacron</a></li>
+                <li><a href="#systemd">Systemd Timers</a></li>
+                <li><a href="#exemples">Exemples pratiques</a></li>
+                <li><a href="#exercices">Exercices</a></li>
+            </ul>
+        </nav>
+        
+        <div class="section" id="introduction">
+            <h2>📋 Introduction aux tâches planifiées</h2>
+            
+            <h3>Qu'est-ce qu'une tâche planifiée ?</h3>
+            <p>Une tâche planifiée est un processus qui s'exécute automatiquement à des moments prédéfinis ou selon un planning spécifique, sans intervention manuelle de l'utilisateur. Sous Linux, ces tâches sont essentielles pour l'automatisation de l'administration système.</p>
+            
+            <h3>Pourquoi utiliser des tâches planifiées ?</h3>
+            <ul>
+                <li><strong>Automatisation :</strong> Exécuter des scripts de maintenance automatiquement</li>
+                <li><strong>Sauvegardes :</strong> Programmer des sauvegardes régulières</li>
+                <li><strong>Nettoyage :</strong> Supprimer les fichiers temporaires périodiquement</li>
+                <li><strong>Surveillance :</strong> Vérifier l'état du système régulièrement</li>
+                <li><strong>Mises à jour :</strong> Installer des mises à jour de sécurité</li>
+                <li><strong>Rapports :</strong> Générer des rapports périodiques</li>
+            </ul>
+            
+            <h3>Outils de planification sous Linux</h3>
+            <table>
+                <tr>
+                    <th>Outil</th>
+                    <th>Description</th>
+                    <th>Usage principal</th>
+                </tr>
+                <tr>
+                    <td><strong>Cron</strong></td>
+                    <td>Démon de planification traditionnel</td>
+                    <td>Tâches récurrentes</td>
+                </tr>
+                <tr>
+                    <td><strong>At</strong></td>
+                    <td>Planification ponctuelle</td>
+                    <td>Tâches uniques</td>
+                </tr>
+                <tr>
+                    <td><strong>Anacron</strong></td>
+                    <td>Cron pour systèmes non permanents</td>
+                    <td>Ordinateurs portables</td>
+                </tr>
+                <tr>
+                    <td><strong>Systemd Timers</strong></td>
+                    <td>Système moderne de planification</td>
+                    <td>Services systemd</td>
+                </tr>
+            </table>
+        </div>
+        
+        <div class="section" id="cron">
+            <h2>⏰ Le démon Cron</h2>
+            
+            <h3>Présentation de Cron</h3>
+            <p>Cron est le démon de planification le plus utilisé sous Linux. Il lit les fichiers de configuration (crontab) et exécute les commandes aux moments spécifiés. Le démon cron fonctionne en arrière-plan et vérifie les tâches à exécuter chaque minute.</p>
+            
+            <h3>Architecture de Cron</h3>
+            <ul>
+                <li><strong>crond :</strong> Le démon principal qui s'exécute en arrière-plan</li>
+                <li><strong>crontab :</strong> Les fichiers de configuration contenant les tâches</li>
+                <li><strong>/etc/cron.d/ :</strong> Répertoire pour les tâches système</li>
+                <li><strong>/var/spool/cron/ :</strong> Répertoire des crontabs utilisateurs</li>
+            </ul>
+            
+            <h3>Vérification du service Cron</h3>
+            <div class="code-block">
+<span class="comment"># Vérifier le statut du service cron</span>
+<span class="command">systemctl status cron</span>
+<span class="comment"># ou sur certaines distributions</span>
+<span class="command">systemctl status crond</span>
+
+<span class="comment"># Démarrer le service cron</span>
+<span class="command">sudo systemctl start cron</span>
+
+<span class="comment"># Activer le service au démarrage</span>
+<span class="command">sudo systemctl enable cron</span>
+            </div>
+            
+            <div class="info">
+                <strong>💡 Astuce :</strong> Le service cron est généralement démarré automatiquement au boot du système sur la plupart des distributions Linux.
+            </div>
+        </div>
+        
+        <div class="section" id="crontab">
+            <h2>📝 Crontab - Configuration des tâches</h2>
+            
+            <h3>Syntaxe de Crontab</h3>
+            <p>Chaque ligne d'un fichier crontab suit cette syntaxe :</p>
+            <div class="code-block">
+<span class="comment"># Format : minute heure jour mois jour_semaine commande</span>
+*  *  *  *  *  commande_à_exécuter
+│  │  │  │  │
+│  │  │  │  └── Jour de la semaine (0-7, 0 et 7 = dimanche)
+│  │  │  └───── Mois (1-12)
+│  │  └──────── Jour du mois (1-31)
+│  └─────────── Heure (0-23)
+└────────────── Minute (0-59)
+            </div>
+            
+            <h3>Caractères spéciaux</h3>
+            <table>
+                <tr>
+                    <th>Caractère</th>
+                    <th>Signification</th>
+                    <th>Exemple</th>
+                </tr>
+                <tr>
+                    <td>*</td>
+                    <td>Toutes les valeurs</td>
+                    <td>* = chaque minute/heure/jour</td>
+                </tr>
+                <tr>
+                    <td>,</td>
+                    <td>Séparateur de valeurs</td>
+                    <td>1,3,5 = aux minutes 1, 3 et 5</td>
+                </tr>
+                <tr>
+                    <td>-</td>
+                    <td>Plage de valeurs</td>
+                    <td>1-5 = de 1 à 5</td>
+                </tr>
+                <tr>
+                    <td>/</td>
+                    <td>Pas d'incrémentation</td>
+                    <td>*/5 = toutes les 5 unités</td>
+                </tr>
+                <tr>
+                    <td>@reboot</td>
+                    <td>Au démarrage</td>
+                    <td>@reboot commande</td>
+                </tr>
+            </table>
+            
+            <h3>Raccourcis temporels</h3>
+            <div class="code-block">
+<span class="comment"># Raccourcis pratiques</span>
+@yearly   = 0 0 1 1 *    <span class="comment"># Une fois par an</span>
+@annually = 0 0 1 1 *    <span class="comment"># Une fois par an</span>
+@monthly  = 0 0 1 * *    <span class="comment"># Une fois par mois</span>
+@weekly   = 0 0 * * 0    <span class="comment"># Une fois par semaine</span>
+@daily    = 0 0 * * *    <span class="comment"># Une fois par jour</span>
+@hourly   = 0 * * * *    <span class="comment"># Une fois par heure</span>
+@reboot                  <span class="comment"># Au démarrage du système</span>
+            </div>
+            
+            <h3>Gestion des crontabs utilisateur</h3>
+            <div class="code-block">
+<span class="comment"># Éditer le crontab de l'utilisateur actuel</span>
+<span class="command">crontab -e</span>
+
+<span class="comment"># Lister les tâches cron de l'utilisateur</span>
+<span class="command">crontab -l</span>
+
+<span class="comment"># Supprimer toutes les tâches cron de l'utilisateur</span>
+<span class="command">crontab -r</span>
+
+<span class="comment"># Éditer le crontab d'un autre utilisateur (root seulement)</span>
+<span class="command">sudo crontab -e -u nomutilisateur</span>
+
+<span class="comment"># Lister les tâches d'un autre utilisateur</span>
+<span class="command">sudo crontab -l -u nomutilisateur</span>
+            </div>
+            
+            <h3>Exemples de tâches cron</h3>
+            <div class="code-block">
+<span class="comment"># Exécuter un script toutes les 5 minutes</span>
+*/5 * * * * /home/user/script.sh
+
+<span class="comment"># Sauvegarde quotidienne à 2h30 du matin</span>
+30 2 * * * /usr/local/bin/backup.sh
+
+<span class="comment"># Nettoyage hebdomadaire le dimanche à minuit</span>
+0 0 * * 0 /usr/local/bin/cleanup.sh
+
+<span class="comment"># Rapport mensuel le 1er de chaque mois à 9h</span>
+0 9 1 * * /usr/local/bin/monthly_report.sh
+
+<span class="comment"># Redémarrage automatique chaque lundi à 3h</span>
+0 3 * * 1 /sbin/reboot
+
+<span class="comment"># Exécution uniquement en semaine à 8h</span>
+0 8 * * 1-5 /usr/local/bin/workday_task.sh
+            </div>
+            
+            <div class="warning">
+                <strong>⚠️ Attention :</strong> Les tâches cron s'exécutent avec un environnement minimal. Spécifiez toujours les chemins complets vers les commandes et fichiers.
+            </div>
+        </div>
+        
+        <div class="section" id="at">
+            <h2>🎯 Commande AT - Planification ponctuelle</h2>
+            
+            <h3>Présentation de AT</h3>
+            <p>La commande <code>at</code> permet de planifier l'exécution d'une ou plusieurs commandes à un moment précis dans le futur. Contrairement à cron, at est conçu pour des tâches uniques, non récurrentes.</p>
+            
+            <h3>Installation d'AT</h3>
+            <div class="code-block">
+<span class="comment"># Installation sur Ubuntu/Debian</span>
+<span class="command">sudo apt update && sudo apt install at</span>
+
+<span class="comment"># Installation sur CentOS/RHEL</span>
+<span class="command">sudo yum install at</span>
+<span class="comment"># ou sur les versions récentes</span>
+<span class="command">sudo dnf install at</span>
+
+<span class="comment"># Démarrer et activer le service atd</span>
+<span class="command">sudo systemctl start atd</span>
+<span class="command">sudo systemctl enable atd</span>
+            </div>
+            
+            <h3>Utilisation de base</h3>
+            <div class="code-block">
+<span class="comment"># Planifier une tâche simple</span>
+<span class="command">at 15:30</span>
+at> echo "Tâche exécutée à 15h30" > /tmp/at_test.txt
+at> <span class="comment"># Appuyer sur Ctrl+D pour terminer</span>
+
+<span class="comment"># Planifier avec un fichier de commandes</span>
+<span class="command">at 20:00 < script.sh</span>
+
+<span class="comment"># Planifier avec l'option -f</span>
+<span class="command">at -f /path/to/script.sh 22:00</span>
+            </div>
+            
+            <h3>Formats de temps acceptés</h3>
+            <div class="code-block">
+<span class="comment"># Formats d'heure</span>
+<span class="command">at 14:30</span>                    <span class="comment"># Aujourd'hui à 14h30</span>
+<span class="command">at 2:30pm</span>                   <span class="comment"># Format AM/PM</span>
+<span class="command">at now + 1 hour</span>             <span class="comment"># Dans 1 heure</span>
+<span class="command">at now + 30 minutes</span>         <span class="comment"># Dans 30 minutes</span>
+<span class="command">at now + 2 days</span>             <span class="comment"># Dans 2 jours</span>
+<span class="command">at 14:30 tomorrow</span>           <span class="comment"># Demain à 14h30</span>
+<span class="command">at 14:30 next monday</span>        <span class="comment"># Lundi prochain à 14h30</span>
+<span class="command">at 14:30 2024-03-15</span>        <span class="comment"># Date spécifique</span>
+            </div>
+            
+            <h3>Gestion des tâches AT</h3>
+            <div class="code-block">
+<span class="comment"># Lister les tâches en attente</span>
+<span class="command">atq</span>
+<span class="comment"># ou</span>
+<span class="command">at -l</span>
+
+<span class="comment"># Supprimer une tâche (remplacer N par le numéro de tâche)</span>
+<span class="command">atrm N</span>
+<span class="comment"># ou</span>
+<span class="command">at -r N</span>
+
+<span class="comment"># Voir le contenu d'une tâche</span>
+<span class="command">at -c N</span>
+            </div>
+            
+            <h3>Contrôle d'accès</h3>
+            <div class="code-block">
+<span class="comment"># Fichiers de contrôle d'accès</span>
+/etc/at.allow    <span class="comment"># Utilisateurs autorisés</span>
+/etc/at.deny     <span class="comment"># Utilisateurs interdits</span>
+
+<span class="comment"># Si at.allow existe, seuls les utilisateurs listés peuvent utiliser at</span>
+<span class="comment"># Si seul at.deny existe, tous sauf ceux listés peuvent utiliser at</span>
+<span class="command">sudo echo "user1" >> /etc/at.allow</span>
+            </div>
+            
+            <div class="info">
+                <strong>💡 Bon à savoir :</strong> Les tâches AT sont stockées dans /var/spool/at/ et sont automatiquement supprimées après exécution.
+            </div>
+        </div>
+        
+        <div class="section" id="anacron">
+            <h2>🔄 Anacron - Cron pour systèmes non permanents</h2>
+            
+            <h3>Qu'est-ce qu'Anacron ?</h3>
+            <p>Anacron est un démon de planification conçu pour les systèmes qui ne fonctionnent pas 24h/24. Il exécute les tâches manquées lorsque le système est redémarré, ce qui est particulièrement utile pour les ordinateurs portables ou les postes de travail.</p>
+            
+            <h3>Différences avec Cron</h3>
+            <table>
+                <tr>
+                    <th>Aspect</th>
+                    <th>Cron</th>
+                    <th>Anacron</th>
+                </tr>
+                <tr>
+                    <td>Précision</td>
+                    <td>À la minute près</td>
+                    <td>À la journée près</td>
+                </tr>
+                <tr>
+                    <td>Système éteint</td>
+                    <td>Tâches manquées</td>
+                    <td>Rattrapage au démarrage</td>
+                </tr>
+                <tr>
+                    <td>Usage</td>
+                    <td>Serveurs permanents</td>
+                    <td>Postes de travail</td>
+                </tr>
+            </table>
+            
+            <h3>Configuration d'Anacron</h3>
+            <p>Le fichier principal de configuration est <code>/etc/anacrontab</code> :</p>
+            <div class="code-block">
+<span class="comment"># Format : période délai identificateur commande</span>
+<span class="comment"># /etc/anacrontab</span>
+SHELL=/bin/sh
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+<span class="comment"># Tâches quotidiennes</span>
+1       5       cron.daily      nice run-parts /etc/cron.daily
+<span class="comment"># Tâches hebdomadaires</span>
+7       25      cron.weekly     nice run-parts /etc/cron.weekly
+<span class="comment"># Tâches mensuelles</span>
+@monthly 45     cron.monthly    nice run-parts /etc/cron.monthly
+            </div>
+            
+            <h3>Syntaxe d'Anacron</h3>
+            <ul>
+                <li><strong>Période :</strong> Nombre de jours entre les exécutions</li>
+                <li><strong>Délai :</strong> Minutes d'attente avant l'exécution</li>
+                <li><strong>Identificateur :</strong> Nom unique pour la tâche</li>
+                <li><strong>Commande :</strong> Commande à exécuter</li>
+            </ul>
+            
+            <h3>Commandes Anacron</h3>
+            <div class="code-block">
+<span class="comment"># Exécuter toutes les tâches anacron maintenant</span>
+<span class="command">sudo anacron -f</span>
+
+<span class="comment"># Tester la configuration</span>
+<span class="command">sudo anacron -T</span>
+
+<span class="comment"># Exécuter en mode debug</span>
+<span class="command">sudo anacron -d</span>
+
+<span class="comment"># Forcer l'exécution d'une tâche spécifique</span>
+<span class="command">sudo anacron -f cron.daily</span>
+            </div>
+        </div>
+        
+        <div class="section" id="systemd">
+            <h2>⚙️ Systemd Timers - Planification moderne</h2>
+            
+            <h3>Introduction aux Systemd Timers</h3>
+            <p>Les timers systemd constituent une alternative moderne à cron, offrant plus de flexibilité et une meilleure intégration avec le système. Ils permettent de déclencher des services systemd selon des plannings définis.</p>
+            
+            <h3>Avantages des Systemd Timers</h3>
+            <ul>
+                <li><strong>Logs centralisés :</strong> Intégration avec journald</li>
+                <li><strong>Gestion des dépendances :</strong> Démarrage conditionnel</li>
+                <li><strong>Flexibilité :</strong> Déclenchement sur événements système</li>
+                <li><strong>Monitoring :</strong> Surveillance avec systemctl</li>
+            </ul>
+            
+            <h3>Création d'un timer systemd</h3>
+            <p>Un timer systemd nécessite deux fichiers :</p>
+            
+            <h4>1. Fichier service (.service)</h4>
+            <div class="code-block">
+<span class="comment"># /etc/systemd/system/backup.service</span>
+[Unit]
+Description=Backup Service
+Wants=backup.timer
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/backup.sh
+
+[Install]
+WantedBy=multi-user.target
+            </div>
+            
+            <h4>2. Fichier timer (.timer)</h4>
+            <div class="code-block">
+<span class="comment"># /etc/systemd/system/backup.timer</span>
+[Unit]
+Description=Backup Timer
+Requires=backup.service
+
+[Timer]
+OnCalendar=daily
+Persistent=true
+
+[Install]
+WantedBy=timers.target
+            </div>
+            
+            <h3>Syntaxe OnCalendar</h3>
+            <div class="code-block">
+<span class="comment"># Exemples de syntaxe OnCalendar</span>
+OnCalendar=*-*-* 02:00:00    <span class="comment"># Tous les jours à 2h</span>
+OnCalendar=Mon *-*-* 02:00:00 <span class="comment"># Tous les lundis à 2h</span>
+OnCalendar=weekly            <span class="comment"># Chaque semaine</span>
+OnCalendar=monthly           <span class="comment"># Chaque mois</span>
+OnCalendar=*-*-01 03:00:00   <span class="comment"># Le 1er de chaque mois à 3h</span>
+OnCalendar=*:0/15            <span class="comment"># Toutes les 15 minutes</span>
+            </div>
+            
+            <h3>Gestion des timers</h3>
+            <div class="code-block">
+<span class="comment"># Recharger la configuration systemd</span>
+<span class="command">sudo systemctl daemon-reload</span>
+
+<span class="comment"># Activer et démarrer le timer</span>
+<span class="command">sudo systemctl enable backup.timer</span>
+<span class="command">sudo systemctl start backup.timer</span>
+
+<span class="comment"># Vérifier le statut du timer</span>
+<span class="command">systemctl status backup.timer</span>
+
+<span class="comment"># Lister tous les timers actifs</span>
+<span class="command">systemctl list-timers</span>
+
+<span class="comment"># Voir les logs du service</span>
+<span class="command">journalctl -u backup.service</span>
+            </div>
+            
+            <h3>Options avancées des timers</h3>
+            <div class="code-block">
+<span class="comment"># Fichier timer avec options avancées</span>
+[Timer]
+OnCalendar=daily
+OnBootSec=15min          <span class="comment"># 15 min après le boot</span>
+OnUnitActiveSec=1h       <span class="comment"># 1h après la dernière activation</span>
+Persistent=true          <span class="comment"># Rattraper les exécutions manquées</span>
+AccuracySec=1min         <span class="comment"># Précision temporelle</span>
+RandomizedDelaySec=300   <span class="comment"># Délai aléatoire jusqu'à 5 min</span>
+            </div>
+        </div>
+        
+        <div class="section" id="exemples">
+            <h2>🔧 Exemples pratiques</h2>
+            
+            <h3>Exemple 1 : Sauvegarde automatique</h3>
+            <div class="code-block">
+<span class="comment"># Script de sauvegarde : /usr/local/bin/backup.sh</span>
+#!/bin/bash
+DATE=$(date +%Y%m%d_%H%M%S)
+BACKUP_DIR="/backup"
+SOURCE_DIR="/home"
+LOG_FILE="/var/log/backup.log"
+
+echo "$(date): Début de la sauvegarde" >> $LOG_FILE
+tar -czf $BACKUP_DIR/backup_$DATE.tar.gz $SOURCE_DIR
+if [ $? -eq 0 ]; then
+    echo "$(date): Sauvegarde réussie" >> $LOG_FILE
+else
+    echo "$(date): Erreur lors de la sauvegarde" >> $LOG_FILE
+fi
+
+<span class="comment"># Crontab pour exécution quotidienne à 2h</span>
+0 2 * * * /usr/local/bin/backup.sh
+            </div>
+            
+            <h3>Exemple 2 : Nettoyage des logs</h3>
+            <div class="code-block">
+<span class="comment"># Script de nettoyage : /usr/local/bin/cleanup_logs.sh</span>
+#!/bin/bash
+LOG_DIRS="/var/log /tmp"
+DAYS_OLD=30
+
+for DIR in $LOG_DIRS; do
+    find $DIR -name "*.log" -type f -mtime +$DAYS_OLD -delete
+    find $DIR -name "*.tmp" -type f -mtime +7 -delete
+done
+
+<span class="comment"># Crontab pour exécution hebdomadaire</span>
+0 3 * * 0 /usr/local/bin/cleanup_logs.sh
+            </div>
+            
+            <h3>Exemple 3 : Surveillance système</h3>
+            <div class="code-block">
+<span class="comment"># Script de surveillance : /usr/local/bin/system_check.sh</span>
+#!/bin/bash
+EMAIL="admin@example.com"
+HOSTNAME=$(hostname)
+
+<span class="comment"># Vérifier l'espace disque</span>
+DISK_USAGE=$(df -h / | awk 'NR==2 {print $5}' | cut -d'%' -f1)
+if [ $DISK_USAGE -gt 90 ]; then
+    echo "ALERTE: Espace disque critique sur $HOSTNAME ($DISK_USAGE%)" | \
+    mail -s "Alerte espace disque" $EMAIL
+fi
+
+<span class="comment"># Vérifier la charge système</span>
+LOAD=$(uptime | awk -F'load average:' '{print $2}' | awk '{print $1}' | cut -d',' -f1)
+if [ $(echo "$LOAD > 5.0" | bc) -eq 1 ]; then
+    echo "ALERTE: Charge système élevée sur $HOSTNAME ($LOAD)" | \
+    mail -s "Alerte charge système" $EMAIL
+fi
+
+<span class="comment"># Crontab pour vérification toutes les 15 minutes</span>
+*/15 * * * * /usr/local/bin/system_check.sh
+            </div>
+            
+            <h3>Exemple 4 : Mise à jour automatique</h3>
+            <div class="code-block">
+<span class="comment"># Script de mise à jour : /usr/local/bin/auto_update.sh</span>
+#!/bin/bash
+LOG_FILE="/var/log/auto_update.log"
+
+echo "$(date): Début des mises à jour" >> $LOG_FILE
+
+<span class="comment"># Pour Ubuntu/Debian</span>
+if command -v apt &> /dev/null; then
+    apt update >> $LOG_FILE 2>&1
+    apt upgrade -y >> $LOG_FILE 2>&1
+fi
+
+<span class="comment"># Pour CentOS/RHEL</span>
+if command -v yum &> /dev/null; then
+    yum update -y >> $LOG_FILE 2>&1
+fi
+
+echo "$(date): Fin des mises à jour" >> $LOG_FILE
+
+<span class="comment"># Crontab pour exécution mensuelle</span>
+0 4 1 * * /usr/local/bin/auto_update.sh
+            </div>
+        </div>
+        
+        <div class="section" id="bonnes-pratiques">
+            <h2>✅ Bonnes pratiques et sécurité</h2>
+            
+            <h3>Bonnes pratiques générales</h3>
+            <ul>
+                <li><strong>Chemins absolus :</strong> Utilisez toujours des chemins complets vers les commandes et fichiers</li>
+                <li><strong>Variables d'environnement :</strong> Définissez PATH, SHELL, et autres variables nécessaires</li>
+                <li><strong>Gestion des erreurs :</strong> Implémentez une gestion d'erreur robuste dans vos scripts</li>
+                <li><strong>Logging :</strong> Enregistrez les activités et erreurs dans des fichiers de log</li>
+                <li><strong>Tests :</strong> Testez vos scripts manuellement avant de les automatiser</li>
+            </ul>
+            
+            <h3>Sécurité des tâches planifiées</h3>
+            <div class="code-block">
+<span class="comment"># Variables d'environnement sécurisées dans crontab</span>
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+SHELL=/bin/bash
+MAILTO=admin@example.com
+
+<span class="comment"># Exemple de crontab sécurisé</span>
+0 2 * * * /usr/local/bin/backup.sh > /var/log/backup.log 2>&1
+            </div>
+            
+            <h3>Gestion des permissions</h3>
+            <div class="code-block">
+<span class="comment"># Permissions appropriées pour les scripts</span>
+<span class="command">chmod 750 /usr/local/bin/backup.sh</span>
+<span class="command">chown root:root /usr/local/bin/backup.sh</span>
+
+<span class="comment"># Sécurisation des fichiers crontab</span>
+<span class="command">chmod 600 /var/spool/cron/crontabs/*</span>
+            </div>
+            
+            <h3>Surveillance et debugging</h3>
+            <div class="code-block">
+<span class="comment"># Vérifier les logs système pour les tâches cron</span>
+<span class="command">grep CRON /var/log/syslog</span>
+<span class="command">grep CRON /var/log/messages</span>
+
+<span class="comment"># Activer le logging détaillé de cron</span>
+<span class="command">sudo vim /etc/rsyslog.conf</span>
+<span class="comment"># Décommenter : cron.*    /var/log/cron.log</span>
+<span class="command">sudo systemctl restart rsyslog</span>
+
+<span class="comment"># Vérifier l'exécution des tâches AT</span>
+<span class="command">sudo cat /var/log/syslog | grep atd</span>
+            </div>
+            
+            <div class="warning">
+                <strong>⚠️ Sécurité :</strong> Ne jamais stocker de mots de passe ou d'informations sensibles en clair dans les tâches planifiées. Utilisez des fichiers de configuration sécurisés ou des variables d'environnement.
+            </div>
+        </div>
+        
+        <div class="section" id="exercices">
+            <h2>📚 Exercices pratiques</h2>
+            
+            <div class="exercise">
+                <h4>Exercice 1 : Création d'une tâche cron basique</h4>
+                <p><strong>Objectif :</strong> Créer une tâche qui affiche la date et l'heure dans un fichier toutes les minutes.</p>
+                <p><strong>Instructions :</strong></p>
+                <ol>
+                    <li>Ouvrez votre crontab avec <code>crontab -e</code></li>
+                    <li>Ajoutez une ligne pour exécuter <code>date >> /tmp/cron_test.txt</code> chaque minute</li>
+                    <li>Attendez quelques minutes et vérifiez le contenu du fichier</li>
+                    <li>Supprimez la tâche une fois le test terminé</li>
+                </ol>
+            </div>
+            
+            <div class="exercise">
+                <h4>Exercice 2 : Script de sauvegarde programmé</h4>
+                <p><strong>Objectif :</strong> Créer un script de sauvegarde et le programmer pour s'exécuter quotidiennement.</p>
+                <p><strong>Instructions :</strong></p>
+                <ol>
+                    <li>Créez un script <code>/usr/local/bin/my_backup.sh</code> qui sauvegarde votre répertoire home</li>
+                    <li>Rendez le script exécutable</li>
+                    <li>Programmez-le pour s'exécuter tous les jours à 3h du matin</li>
+                    <li>Testez manuellement le script avant de l'automatiser</li>
+                </ol>
+            </div>
+            
+            <div class="exercise">
+                <h4>Exercice 3 : Utilisation de la commande AT</h4>
+                <p><strong>Objectif :</strong> Programmer une tâche ponctuelle avec AT.</p>
+                <p><strong>Instructions :</strong></p>
+                <ol>
+                    <li>Utilisez <code>at</code> pour programmer l'arrêt du système dans 30 minutes</li>
+                    <li>Listez les tâches en attente avec <code>atq</code></li>
+                    <li>Annulez la tâche avant qu'elle ne s'exécute avec <code>atrm</code></li>
+                    <li>Créez une tâche qui redémarre un service dans 5 minutes</li>
+                </ol>
+            </div>
+            
+            <div class="exercise">
+                <h4>Exercice 4 : Création d'un timer systemd</h4>
+                <p><strong>Objectif :</strong> Créer un timer systemd pour une tâche de maintenance.</p>
+                <p><strong>Instructions :</strong></p>
+                <ol>
+                    <li>Créez un service systemd qui nettoie les fichiers temporaires</li>
+                    <li>Créez un timer associé qui s'exécute quotidiennement</li>
+                    <li>Activez et démarrez le timer</li>
+                    <li>Vérifiez son fonctionnement avec <code>systemctl list-timers</code></li>
+                </ol>
+            </div>
+            
+            <div class="exercise">
+                <h4>Exercice 5 : Surveillance système automatisée</h4>
+                <p><strong>Objectif :</strong> Créer un script de surveillance qui envoie des alertes.</p>
+                <p><strong>Instructions :</strong></p>
+                <ol>
+                    <li>Créez un script qui vérifie l'espace disque, la mémoire et la charge CPU</li>
+                    <li>Le script doit envoyer une alerte (mail ou log) si les seuils sont dépassés</li>
+                    <li>Programmez le script pour s'exécuter toutes les 10 minutes</li>
+                    <li>Testez les alertes en simulant une charge élevée</li>
+                </ol>
+            </div>
+        </div>
+        
+        <div class="section" id="depannage">
+            <h2>🔍 Dépannage et résolution de problèmes</h2>
+            
+            <h3>Problèmes courants avec Cron</h3>
+            <table>
+                <tr>
+                    <th>Problème</th>
+                    <th>Cause probable</th>
+                    <th>Solution</th>
+                </tr>
+                <tr>
+                    <td>Tâche ne s'exécute pas</td>
+                    <td>Syntaxe incorrecte</td>
+                    <td>Vérifier la syntaxe crontab</td>
+                </tr>
+                <tr>
+                    <td>Commande introuvable</td>
+                    <td>PATH incomplet</td>
+                    <td>Utiliser les chemins absolus</td>
+                </tr>
+                <tr>
+                    <td>Permissions refusées</td>
+                    <td>Script non exécutable</td>
+                    <td>chmod +x sur le script</td>
+                </tr>
+                <tr>
+                    <td>Variables manquantes</td>
+                    <td>Environnement minimal</td>
+                    <td>Définir les variables dans crontab</td>
+                </tr>
+            </table>
+            
+            <h3>Outils de diagnostic</h3>
+            <div class="code-block">
+<span class="comment"># Vérifier si cron fonctionne</span>
+<span class="command">ps aux | grep cron</span>
+<span class="command">systemctl status cron</span>
+
+<span class="comment"># Vérifier la syntaxe crontab</span>
+<span class="command">crontab -l</span>
+
+<span class="comment"># Tester un script manuellement</span>
+<span class="command">sudo -u username /path/to/script.sh</span>
+
+<span class="comment"># Vérifier les logs d'exécution</span>
+<span class="command">tail -f /var/log/syslog | grep CRON</span>
+            </div>
+            
+            <h3>Conseils de dépannage</h3>
+            <ul>
+                <li>Testez toujours vos scripts manuellement avant de les automatiser</li>
+                <li>Utilisez des redirections pour capturer les erreurs : <code>command > /dev/null 2>&1</code></li>
+                <li>Définissez MAILTO pour recevoir les erreurs par email</li>
+                <li>Utilisez <code>set -e</code> dans vos scripts pour arrêter en cas d'erreur</li>
+                <li>Loggez les activités de vos scripts pour faciliter le debugging</li>
+            </ul>
+        </div>
+        
+        <div class="section" id="resume">
+            <h2>📋 Résumé du cours</h2>
+            
+            <h3>Points clés à retenir</h3>
+            <ul>
+                <li><strong>Cron</strong> est l'outil principal pour les tâches récurrentes sous Linux</li>
+                <li><strong>AT</strong> permet de programmer des tâches ponctuelles</li>
+                <li><strong>Anacron</strong> rattrape les tâches manquées sur les systèmes non permanents</li>
+                <li><strong>Systemd timers</strong> offrent une alternative moderne avec plus de fonctionnalités</li>
+                <li>La sécurité et les bonnes pratiques sont essentielles pour éviter les problèmes</li>
+            </ul>
+            
+            <h3>Commandes essentielles</h3>
+            <div class="code-block">
+<span class="comment"># Gestion crontab</span>
+<span class="command">crontab -e</span>      <span class="comment"># Éditer</span>
+<span class="command">crontab -l</span>      <span class="comment"># Lister</span>
+<span class="command">crontab -r</span>      <span class="comment"># Supprimer</span>
+
+<span class="comment"># Commande AT</span>
+<span class="command">at time</span>         <span class="comment"># Programmer</span>
+<span class="command">atq</span>             <span class="comment"># Lister</span>
+<span class="command">atrm N</span>          <span class="comment"># Supprimer</span>
+
+<span class="comment"># Systemd timers</span>
+<span class="command">systemctl list-timers</span>   <span class="comment"># Lister</span>
+<span class="command">systemctl status timer</span>  <span class="comment"># Statut</span>
+            </div>
+            
+            <h3>Prochaines étapes</h3>
+            <p>Dans le prochain cours, nous aborderons la <strong>gestion des logs</strong> sous Linux, un sujet étroitement lié aux tâches planifiées pour la surveillance et la maintenance du système.</p>
+        </div>
+        
+        <div class="footer">
+            <p>Formation Administration Système Linux - Jour 20 - Tâches planifiées</p>
+            <p>Responsable : Jean Tene | © 2025</p>
+        </div>
+    </div>
+</body>
+</html>

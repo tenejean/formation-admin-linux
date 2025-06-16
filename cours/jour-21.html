@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jour 21 - Gestion de disques sous Linux</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border-radius: 20px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .header {
+            text-align: center;
+            padding: 40px 0;
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            color: white;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .nav {
+            background: #34495e;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .nav ul {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+        
+        .nav a {
+            color: #ecf0f1;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .nav a:hover {
+            background: #3498db;
+            transform: translateY(-2px);
+        }
+        
+        .section {
+            margin-bottom: 40px;
+            padding: 30px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+            border-left: 5px solid #3498db;
+            transition: transform 0.3s ease;
+        }
+        
+        .section:hover {
+            transform: translateY(-5px);
+        }
+        
+        .section h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section h3 {
+            color: #34495e;
+            margin: 25px 0 15px 0;
+            font-size: 1.4em;
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 5px;
+        }
+        
+        .code-block {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            margin: 15px 0;
+            overflow-x: auto;
+            position: relative;
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .code-block::before {
+            content: '$ ';
+            color: #3498db;
+            font-weight: bold;
+        }
+        
+        .command {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        
+        .output {
+            background: #ecf0f1;
+            color: #2c3e50;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            margin: 10px 0;
+            border-left: 4px solid #3498db;
+        }
+        
+        .warning {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
+        }
+        
+        .warning::before {
+            content: '⚠️ ';
+            font-size: 1.2em;
+        }
+        
+        .info {
+            background: linear-gradient(135deg, #74b9ff, #0984e3);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            box-shadow: 0 5px 15px rgba(116, 185, 255, 0.3);
+        }
+        
+        .info::before {
+            content: 'ℹ️ ';
+            font-size: 1.2em;
+        }
+        
+        .tip {
+            background: linear-gradient(135deg, #00b894, #00a085);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            box-shadow: 0 5px 15px rgba(0, 184, 148, 0.3);
+        }
+        
+        .tip::before {
+            content: '💡 ';
+            font-size: 1.2em;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        
+        th {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            font-weight: 600;
+        }
+        
+        tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .exercise {
+            background: linear-gradient(135deg, #a29bfe, #6c5ce7);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 30px 0;
+            box-shadow: 0 10px 25px rgba(162, 155, 254, 0.3);
+        }
+        
+        .exercise h3 {
+            color: white;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+            margin-bottom: 20px;
+        }
+        
+        .icon {
+            font-size: 1.5em;
+            margin-right: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                padding: 15px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .nav ul {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .section {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🖥️ Jour 21 - Gestion de disques</h1>
+            <p>Formation Administration Système Linux - Jean Tene</p>
+        </div>
+        
+        <nav class="nav">
+            <ul>
+                <li><a href="#introduction">Introduction</a></li>
+                <li><a href="#concepts">Concepts de base</a></li>
+                <li><a href="#partitionnement">Partitionnement</a></li>
+                <li><a href="#systemes-fichiers">Systèmes de fichiers</a></li>
+                <li><a href="#montage">Montage</a></li>
+                <li><a href="#surveillance">Surveillance</a></li>
+                <li><a href="#exercices">Exercices</a></li>
+            </ul>
+        </nav>
+        
+        <section id="introduction" class="section">
+            <h2><span class="icon">📚</span>Introduction</h2>
+            <p>La gestion des disques est une compétence fondamentale pour tout administrateur système Linux. Elle comprend la compréhension des périphériques de stockage, le partitionnement, la création de systèmes de fichiers, le montage et la surveillance de l'espace disque.</p>
+            
+            <h3>Objectifs du cours</h3>
+            <ul>
+                <li>Comprendre l'architecture des disques sous Linux</li>
+                <li>Maîtriser les outils de partitionnement</li>
+                <li>Créer et gérer des systèmes de fichiers</li>
+                <li>Configurer le montage automatique</li>
+                <li>Surveiller l'utilisation des disques</li>
+            </ul>
+        </section>
+        
+        <section id="concepts" class="section">
+            <h2><span class="icon">🔧</span>Concepts de base</h2>
+            
+            <h3>Types de périphériques</h3>
+            <p>Sous Linux, les périphériques de stockage sont représentés par des fichiers spéciaux dans le répertoire <code>/dev</code>.</p>
+            
+            <table>
+                <tr>
+                    <th>Type</th>
+                    <th>Convention de nommage</th>
+                    <th>Exemple</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td>IDE/PATA</td>
+                    <td>/dev/hd*</td>
+                    <td>/dev/hda1</td>
+                    <td>Anciens disques IDE</td>
+                </tr>
+                <tr>
+                    <td>SATA/SCSI/SAS</td>
+                    <td>/dev/sd*</td>
+                    <td>/dev/sda1</td>
+                    <td>Disques modernes</td>
+                </tr>
+                <tr>
+                    <td>NVMe</td>
+                    <td>/dev/nvme*</td>
+                    <td>/dev/nvme0n1p1</td>
+                    <td>SSD NVMe</td>
+                </tr>
+                <tr>
+                    <td>MMC/SD</td>
+                    <td>/dev/mmcblk*</td>
+                    <td>/dev/mmcblk0p1</td>
+                    <td>Cartes SD</td>
+                </tr>
+            </table>
+            
+            <h3>Identification des disques</h3>
+            <div class="code-block">
+                <span class="command">lsblk</span> # Afficher la structure des disques
+            </div>
+            <div class="output">
+NAME   MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
+sda      8:0    0   20G  0 disk 
+├─sda1   8:1    0    1G  0 part /boot
+├─sda2   8:2    0    2G  0 part [SWAP]
+└─sda3   8:3    0   17G  0 part /
+sdb      8:16   0   10G  0 disk 
+└─sdb1   8:17   0   10G  0 part /home
+            </div>
+            
+            <div class="code-block">
+                <span class="command">fdisk -l</span> # Lister tous les disques et partitions
+            </div>
+            
+            <div class="code-block">
+                <span class="command">blkid</span> # Afficher les UUID et types de systèmes de fichiers
+            </div>
+            <div class="output">
+/dev/sda1: UUID="a1b2c3d4-e5f6-7890-abcd-ef1234567890" TYPE="ext4"
+/dev/sda2: UUID="12345678-abcd-ef90-1234-567890abcdef" TYPE="swap"
+            </div>
+        </section>
+        
+        <section id="partitionnement" class="section">
+            <h2><span class="icon">✂️</span>Partitionnement</h2>
+            
+            <h3>Types de tables de partition</h3>
+            
+            <h4>MBR (Master Boot Record)</h4>
+            <ul>
+                <li>Maximum 4 partitions primaires</li>
+                <li>Une partition étendue peut contenir plusieurs partitions logiques</li>
+                <li>Limite de 2 To par disque</li>
+                <li>Compatible avec les anciens systèmes</li>
+            </ul>
+            
+            <h4>GPT (GUID Partition Table)</h4>
+            <ul>
+                <li>Jusqu'à 128 partitions</li>
+                <li>Support des disques > 2 To</li>
+                <li>Redondance des métadonnées</li>
+                <li>Requis pour UEFI</li>
+            </ul>
+            
+            <h3>Outils de partitionnement</h3>
+            
+            <h4>fdisk - Outil classique</h4>
+            <div class="code-block">
+                <span class="command">fdisk /dev/sdb</span> # Ouvrir fdisk pour le disque sdb
+            </div>
+            
+            <div class="info">
+                <strong>Commandes principales dans fdisk :</strong><br>
+                • <code>p</code> : afficher les partitions<br>
+                • <code>n</code> : créer une nouvelle partition<br>
+                • <code>d</code> : supprimer une partition<br>
+                • <code>t</code> : changer le type de partition<br>
+                • <code>w</code> : écrire les modifications<br>
+                • <code>q</code> : quitter sans sauvegarder
+            </div>
+            
+            <h4>parted - Outil moderne</h4>
+            <div class="code-block">
+                <span class="command">parted /dev/sdb</span>
+            </div>
+            <div class="code-block">
+                <span class="command">parted /dev/sdb mklabel gpt</span> # Créer une table GPT
+            </div>
+            <div class="code-block">
+                <span class="command">parted /dev/sdb mkpart primary ext4 0% 50%</span> # Créer une partition
+            </div>
+            
+            <h4>gdisk - Pour GPT uniquement</h4>
+            <div class="code-block">
+                <span class="command">gdisk /dev/sdb</span> # Interface similaire à fdisk pour GPT
+            </div>
+            
+            <div class="warning">
+                <strong>Attention :</strong> Le partitionnement détruit les données existantes. Toujours faire des sauvegardes avant toute modification !
+            </div>
+            
+            <h3>Exemple pratique de partitionnement</h3>
+            <div class="code-block">
+                # Créer une table de partition GPT
+                <span class="command">parted /dev/sdb mklabel gpt</span>
+                
+                # Créer une partition de 10 Go
+                <span class="command">parted /dev/sdb mkpart primary ext4 1MiB 10GiB</span>
+                
+                # Créer une partition pour le reste de l'espace
+                <span class="command">parted /dev/sdb mkpart primary ext4 10GiB 100%</span>
+                
+                # Vérifier les partitions
+                <span class="command">parted /dev/sdb print</span>
+            </div>
+        </section>
+        
+        <section id="systemes-fichiers" class="section">
+            <h2><span class="icon">📁</span>Systèmes de fichiers</h2>
+            
+            <h3>Types de systèmes de fichiers</h3>
+            <table>
+                <tr>
+                    <th>Système</th>
+                    <th>Utilisation</th>
+                    <th>Avantages</th>
+                    <th>Inconvénients</th>
+                </tr>
+                <tr>
+                    <td>ext4</td>
+                    <td>Usage général Linux</td>
+                    <td>Stable, journalisé, performant</td>
+                    <td>Pas de compression native</td>
+                </tr>
+                <tr>
+                    <td>xfs</td>
+                    <td>Gros volumes, haute performance</td>
+                    <td>Très performant, scalable</td>
+                    <td>Pas de réduction de taille</td>
+                </tr>
+                <tr>
+                    <td>btrfs</td>
+                    <td>Fonctionnalités avancées</td>
+                    <td>Snapshots, compression, RAID</td>
+                    <td>Moins mature</td>
+                </tr>
+                <tr>
+                    <td>fat32</td>
+                    <td>Compatibilité multi-OS</td>
+                    <td>Universellement supporté</td>
+                    <td>Limite 4 Go par fichier</td>
+                </tr>
+                <tr>
+                    <td>ntfs</td>
+                    <td>Partitions Windows</td>
+                    <td>Fonctionnalités avancées</td>
+                    <td>Support Linux limité</td>
+                </tr>
+            </table>
+            
+            <h3>Création de systèmes de fichiers</h3>
+            
+            <h4>ext4</h4>
+            <div class="code-block">
+                <span class="command">mkfs.ext4 /dev/sdb1</span> # Formatage basique
+            </div>
+            <div class="code-block">
+                <span class="command">mkfs.ext4 -L "MonDisque" /dev/sdb1</span> # Avec label
+            </div>
+            <div class="code-block">
+                <span class="command">mkfs.ext4 -m 1 /dev/sdb1</span> # Réserver 1% pour root
+            </div>
+            
+            <h4>xfs</h4>
+            <div class="code-block">
+                <span class="command">mkfs.xfs /dev/sdb1</span>
+            </div>
+            <div class="code-block">
+                <span class="command">mkfs.xfs -L "DataDisk" /dev/sdb1</span> # Avec label
+            </div>
+            
+            <h4>btrfs</h4>
+            <div class="code-block">
+                <span class="command">mkfs.btrfs /dev/sdb1</span>
+            </div>
+            <div class="code-block">
+                <span class="command">mkfs.btrfs -L "BackupDisk" /dev/sdb1</span>
+            </div>
+            
+            <h3>Modification des systèmes de fichiers</h3>
+            
+            <h4>Redimensionnement</h4>
+            <div class="code-block">
+                # Agrandir un système ext4 (doit être démonté)
+                <span class="command">resize2fs /dev/sdb1</span>
+                
+                # Agrandir un système xfs (doit être monté)
+                <span class="command">xfs_growfs /point/de/montage</span>
+            </div>
+            
+            <h4>Vérification et réparation</h4>
+            <div class="code-block">
+                # Vérifier un système ext4
+                <span class="command">fsck.ext4 /dev/sdb1</span>
+                
+                # Réparation automatique
+                <span class="command">fsck.ext4 -y /dev/sdb1</span>
+                
+                # Vérifier un système xfs
+                <span class="command">xfs_check /dev/sdb1</span>
+            </div>
+            
+            <div class="warning">
+                <strong>Important :</strong> Ne jamais utiliser fsck sur un système de fichiers monté ! Cela peut causer une corruption des données.
+            </div>
+        </section>
+        
+        <section id="montage" class="section">
+            <h2><span class="icon">🔗</span>Montage des systèmes de fichiers</h2>
+            
+            <h3>Montage manuel</h3>
+            <div class="code-block">
+                # Créer un point de montage
+                <span class="command">mkdir /mnt/mondisque</span>
+                
+                # Monter le système de fichiers
+                <span class="command">mount /dev/sdb1 /mnt/mondisque</span>
+                
+                # Monter avec des options spécifiques
+                <span class="command">mount -o rw,noatime /dev/sdb1 /mnt/mondisque</span>
+                
+                # Démonter
+                <span class="command">umount /mnt/mondisque</span>
+            </div>
+            
+            <h3>Options de montage courantes</h3>
+            <table>
+                <tr>
+                    <th>Option</th>
+                    <th>Description</th>
+                    <th>Utilisation</th>
+                </tr>
+                <tr>
+                    <td>rw / ro</td>
+                    <td>Lecture-écriture / Lecture seule</td>
+                    <td>Contrôle des permissions</td>
+                </tr>
+                <tr>
+                    <td>noatime</td>
+                    <td>Ne pas mettre à jour l'heure d'accès</td>
+                    <td>Améliore les performances</td>
+                </tr>
+                <tr>
+                    <td>noexec</td>
+                    <td>Interdire l'exécution de fichiers</td>
+                    <td>Sécurité (temp, home)</td>
+                </tr>
+                <tr>
+                    <td>nosuid</td>
+                    <td>Ignorer les bits SUID/SGID</td>
+                    <td>Sécurité</td>
+                </tr>
+                <tr>
+                    <td>nodev</td>
+                    <td>Ignorer les fichiers de périphériques</td>
+                    <td>Sécurité</td>
+                </tr>
+            </table>
+            
+            <h3>Montage automatique - /etc/fstab</h3>
+            <p>Le fichier <code>/etc/fstab</code> configure le montage automatique des systèmes de fichiers au démarrage.</p>
+            
+            <h4>Structure du fichier fstab</h4>
+            <div class="output">
+# Périphérique    Point_montage    Type    Options    Dump    Pass
+/dev/sda1        /                ext4    defaults   1       1
+/dev/sda2        /home            ext4    defaults   1       2
+/dev/sda3        none             swap    sw         0       0
+UUID=12345-67890 /mnt/data        ext4    noatime    0       2
+            </div>
+            
+            <div class="info">
+                <strong>Colonnes de /etc/fstab :</strong><br>
+                1. <strong>Périphérique</strong> : /dev/sdX ou UUID<br>
+                2. <strong>Point de montage</strong> : répertoire de destination<br>
+                3. <strong>Type</strong> : système de fichiers<br>
+                4. <strong>Options</strong> : options de montage<br>
+                5. <strong>Dump</strong> : sauvegarde (0 ou 1)<br>
+                6. <strong>Pass</strong> : ordre de vérification fsck
+            </div>
+            
+            <h4>Utilisation des UUID</h4>
+            <div class="code-block">
+                # Obtenir l'UUID d'une partition
+                <span class="command">blkid /dev/sdb1</span>
+                
+                # Utiliser l'UUID dans fstab (recommandé)
+                UUID=a1b2c3d4-e5f6-7890-abcd-ef1234567890 /mnt/data ext4 defaults 0 2
+            </div>
+            
+            <div class="tip">
+                <strong>Conseil :</strong> Utilisez toujours les UUID dans /etc/fstab plutôt que les noms de périphériques, car ces derniers peuvent changer.
+            </div>
+            
+            <h4>Test de la configuration fstab</h4>
+            <div class="code-block">
+                # Tester le montage de tous les systèmes
+                <span class="command">mount -a</span>
+                
+                # Tester un montage spécifique
+                <span class="command">mount /mnt/data</span>
+            </div>
+        </section>
+        
+        <section id="surveillance" class="section">
+            <h2><span class="icon">📊</span>Surveillance des disques</h2>
+            
+            <h3>Utilisation de l'espace disque</h3>
+            
+            <h4>Commande df</h4>
+            <div class="code-block">
+                <span class="command">df -h</span> # Affichage lisible
+            </div>
+            <div class="output">
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/sda1        20G   15G  4.2G  79% /
+/dev/sda2       100G   45G   50G  48% /home
+tmpfs           2.0G     0  2.0G   0% /dev/shm
+            </div>
+            
+            <div class="code-block">
+                <span class="command">df -i</span> # Utilisation des inodes
+            </div>
+            
+            <h4>Commande du</h4>
+            <div class="code-block">
+                <span class="command">du -h /home</span> # Taille d'un répertoire
+            </div>
+            <div class="code-block">
+                <span class="command">du -sh /home/*</span> # Taille de chaque sous-répertoire
+            </div>
+            <div class="code-block">
+                <span class="command">du -h --max-depth=1 /var</span> # Limiter la profondeur
+            </div>
+            
+            <h3>Surveillance des performances</h3>
+            
+            <h4>iostat</h4>
+            <div class="code-block">
+                <span class="command">iostat -x 1</span> # Statistiques E/S en temps réel
+            </div>
+            
+            <h4>iotop</h4>
+            <div class="code-block">
+                <span class="command">iotop</span> # Processus utilisant le plus d'E/S
+            </div>
+            
+            <h3>Alertes automatiques</h3>
+            <div class="code-block">
+                # Script simple d'alerte d'espace disque
+                #!/bin/bash
+                THRESHOLD=90
+                df -h | awk 'NR>1 {print $5 " " $6}' | while read output;
+                do
+                    usep=$(echo $output | awk '{print $1}' | cut -d'%' -f1)
+                    partition=$(echo $output | awk '{print $2}')
+                    if [ $usep -ge $THRESHOLD ]; then
+                        echo "Alerte: $partition utilise ${usep}% de l'espace"
+                    fi
+                done
+            </div>
+            
+            <h3>Maintenance préventive</h3>
+            
+            <h4>Nettoyage automatique</h4>
+            <div class="code-block">
+                # Nettoyer les fichiers temporaires
+                <span class="command">find /tmp -type f -atime +7 -delete</span>
+                
+                # Nettoyer les logs anciens
+                <span class="command">find /var/log -name "*.log" -type f -mtime +30 -delete</span>
+                
+                # Vider la corbeille des utilisateurs
+                <span class="command">find /home/*/.*local/share/Trash -type f -delete</span>
+            </div>
+            
+            <h4>Rotation des logs</h4>
+            <p>Configurer logrotate pour éviter que les logs consomment tout l'espace disque.</p>
+            <div class="code-block">
+                # Exemple de configuration logrotate
+                /var/log/monapp/*.log {
+                    daily
+                    rotate 30
+                    compress
+                    delaycompress
+                    missingok
+                    notifempty
+                    create 0644 root root
+                }
+            </div>
+        </section>
+        
+        <section id="exercices" class="section exercise">
+            <h2><span class="icon">🏋️</span>Exercices pratiques</h2>
+            
+            <h3>Exercice 1 : Partitionnement et formatage</h3>
+            <p><strong>Objectif :</strong> Créer et formater une nouvelle partition</p>
+            <ol>
+                <li>Identifier un disque libre avec <code>lsblk</code></li>
+                <li>Créer une table de partition GPT avec <code>parted</code></li>
+                <li>Créer une partition de 5 Go</li>
+                <li>Formater la partition en ext4</li>
+                <li>Attribuer un label "EXERCICE1"</li>
+                <li>Vérifier avec <code>blkid</code></li>
+            </ol>
+            
+            <h3>Exercice 2 : Configuration du montage automatique</h3>
+            <p><strong>Objectif :</strong> Configurer le montage automatique dans /etc/fstab</p>
+            <ol>
+                <li>Créer le point de montage <code>/mnt/exercice</code></li>
+                <li>Obtenir l'UUID de la partition créée</li>
+                <li>Ajouter une entrée dans <code>/etc/fstab</code></li>
+                <li>Tester avec <code>mount -a</code></li>
+                <li>Vérifier le montage avec <code>df -h</code></li>
+                <li>Ajouter l'option <code>noatime</code> pour optimiser les performances</li>
+            </ol>
+            
+            <h3>Exercice 3 : Surveillance et maintenance</h3>
+            <p><strong>Objectif :</strong> Mettre en place une surveillance de l'espace disque</p>
+            <ol>
+                <li>Créer un script de surveillance qui alerte si l'utilisation dépasse 80%</li>
+                <li>Tester le script sur différentes partitions</li>
+                <li>Programmer le script dans crontab pour une exécution quotidienne</li>
+                <li>Créer des fichiers de test pour simuler un disque plein</li>
+                <li>Vérifier le fonctionnement des alertes</li>
+            </ol>
+            
+            <h3>Exercice 4 : Récupération d'urgence</h3>
+            <p><strong>Objectif :</strong> Simuler et résoudre des problèmes de disque</p>
+            <ol>
+                <li>Démonter brutalement un système de fichiers</li>
+                <li>Simuler une corruption avec <code>dd</code></li>
+                <li>Utiliser <code>fsck</code> pour réparer</li>
+                <li>Vérifier l'intégrité des données</li>
+                <li>Documenter la procédure de récupération</li>
+            </ol>
+            
+            <h3>Solutions des exercices</h3>
+            <div class="code-block">
+                # Exercice 1 - Solution
+                # 1. Identifier les disques
+                lsblk
+                
+                # 2. Créer table GPT
+                parted /dev/sdb mklabel gpt
+                
+                # 3. Créer partition de 5 Go
+                parted /dev/sdb mkpart primary ext4 1MiB 5GiB
+                
+                # 4. Formater en ext4
+                mkfs.ext4 /dev/sdb1
+                
+                # 5. Ajouter un label
+                e2label /dev/sdb1 EXERCICE1
+                
+                # 6. Vérifier
+                blkid /dev/sdb1
+            </div>
+            
+            <div class="code-block">
+                # Exercice 2 - Solution
+                # 1. Créer point de montage
+                mkdir /mnt/exercice
+                
+                # 2. Obtenir UUID
+                blkid /dev/sdb1
+                
+                # 3. Ajouter dans fstab
+                echo "UUID=your-uuid-here /mnt/exercice ext4 defaults,noatime 0 2" >> /etc/fstab
+                
+                # 4. Tester
+                mount -a
+                
+                # 5. Vérifier
+                df -h
+            </div>
+        </section>
+        
+        <section class="section">
+            <h2><span class="icon">📋</span>Résumé et bonnes pratiques</h2>
+            
+            <h3>Points clés à retenir</h3>
+            <ul>
+                <li><strong>Planification :</strong> Toujours planifier la structure des disques avant l'installation</li>
+                <li><strong>Sauvegarde :</strong> Sauvegarder les données avant toute opération de partitionnement</li>
+                <li><strong>UUID :</strong> Utiliser les UUID dans /etc/fstab pour éviter les problèmes de nommage</li>
+                <li><strong>Surveillance :</strong> Mettre en place une surveillance proactive de l'espace disque</li>
+                <li><strong>Maintenance :</strong> Planifier des tâches de maintenance régulières</li>
+            </ul>
+            
+            <h3>Bonnes pratiques</h3>
+            
+            <h4>Sécurité</h4>
+            <ul>
+                <li>Utiliser des options de montage restrictives (noexec, nosuid) pour les partitions non-système</li>
+                <li>Séparer les données utilisateur du système (/home sur une partition séparée)</li>
+                <li>Chiffrer les partitions sensibles</li>
+                <li>Contrôler régulièrement l'intégrité des systèmes de fichiers</li>
+            </ul>
+            
+            <h4>Performance</h4>
+            <ul>
+                <li>Utiliser l'option noatime pour réduire les écritures</li>
+                <li>Choisir le système de fichiers adapté à l'usage (ext4 pour général, xfs pour gros volumes)</li>
+                <li>Aligner les partitions sur les limites des secteurs</li>
+                <li>Surveiller les performances I/O avec iostat</li>
+            </ul>
+            
+            <h4>Maintenance</h4>
+            <ul>
+                <li>Programmer des vérifications fsck régulières</li>
+                <li>Mettre en place la rotation des logs</li>
+                <li>Surveiller l'utilisation des inodes</li>
+                <li>Documenter la configuration des disques</li>
+            </ul>
+            
+            <div class="tip">
+                <strong>Astuce professionnelle :</strong> Gardez toujours un disque de secours avec un système de récupération bootable. Cela peut vous sauver en cas de problème majeur !
+            </div>
+        </section>
+        
+        <section class="section">
+            <h2><span class="icon">🔗</span>Commandes de référence rapide</h2>
+            
+            <h3>Identification et information</h3>
+            <div class="code-block">
+                lsblk                    # Structure des disques
+                fdisk -l                 # Liste des partitions
+                blkid                    # UUID et types de FS
+                df -h                    # Utilisation des disques
+                du -sh /path             # Taille d'un répertoire
+            </div>
+            
+            <h3>Partitionnement</h3>
+            <div class="code-block">
+                fdisk /dev/sdX           # Partitionnement MBR
+                parted /dev/sdX          # Partitionnement GPT
+                gdisk /dev/sdX           # Partitionnement GPT (expert)
+            </div>
+            
+            <h3>Systèmes de fichiers</h3>
+            <div class="code-block">
+                mkfs.ext4 /dev/sdX1      # Créer ext4
+                mkfs.xfs /dev/sdX1       # Créer xfs
+                fsck.ext4 /dev/sdX1      # Vérifier ext4
+                resize2fs /dev/sdX1      # Redimensionner ext4
+            </div>
+            
+            <h3>Montage</h3>
+            <div class="code-block">
+                mount /dev/sdX1 /mnt     # Monter
+                umount /mnt              # Démonter
+                mount -a                 # Monter tout (fstab)
+                mount -o remount,rw /    # Remonter avec options
+            </div>
+            
+            <h3>Surveillance</h3>
+            <div class="code-block">
+                iostat -x 1              # Statistiques I/O
+                iotop                    # Processus I/O
+                lsof /path               # Fichiers ouverts
+                fuser -v /path           # Utilisateurs d'un fichier
+            </div>
+        </section>
+        
+        <section class="section">
+            <h2><span class="icon">📚</span>Pour aller plus loin</h2>
+            
+            <h3>Sujets avancés</h3>
+            <ul>
+                <li><strong>LVM (Logical Volume Manager) :</strong> Gestion flexible des volumes logiques</li>
+                <li><strong>RAID logiciel :</strong> Redondance et performance avec mdadm</li>
+                <li><strong>Chiffrement :</strong> LUKS pour protéger les données sensibles</li>
+                <li><strong>Systèmes de fichiers distribués :</strong> GlusterFS, Ceph</li>
+                <li><strong>Snapshots :</strong> Sauvegardes instantanées avec btrfs ou LVM</li>
+            </ul>
+            
+            <h3>Outils complémentaires</h3>
+            <ul>
+                <li><strong>smartctl :</strong> Surveillance SMART des disques</li>
+                <li><strong>hdparm :</strong> Configuration des paramètres de disque</li>
+                <li><strong>badblocks :</strong> Test des secteurs défectueux</li>
+                <li><strong>ncdu :</strong> Analyseur d'utilisation disque interactif</li>
+                <li><strong>gparted :</strong> Interface graphique pour le partitionnement</li>
+            </ul>
+            
+            <div class="info">
+                <strong>Prochaine étape :</strong> Le Jour 22 abordera LVM et RAID, des technologies qui s'appuient sur les concepts vus aujourd'hui pour offrir plus de flexibilité et de sécurité.
+            </div>
+        </section>
+        
+        <footer style="text-align: center; margin-top: 40px; padding: 20px; background: #2c3e50; color: white; border-radius: 10px;">
+            <p><strong>Formation Administration Système Linux - Jour 21</strong></p>
+            <p>Responsable : Jean Tene | Créé avec passion pour l'apprentissage 🚀</p>
+            <p style="font-size: 0.9em; opacity: 0.8;">Maîtrisez les disques, maîtrisez le système !</p>
+        </footer>
+    </div>
+</body>
+</html>
+                

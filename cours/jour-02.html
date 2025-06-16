@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jour 02 - Installation de Linux</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            font-weight: 300;
+        }
+        
+        .content {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        
+        h2 {
+            color: #34495e;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+        
+        h3 {
+            color: #2980b9;
+            margin-top: 25px;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+        
+        .objectives, .prerequisites {
+            background: #e8f4f8;
+            border-left: 4px solid #3498db;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        
+        .objectives h2, .prerequisites h2 {
+            color: #2980b9;
+            margin-top: 0;
+        }
+        
+        ul, ol {
+            padding-left: 20px;
+        }
+        
+        li {
+            margin-bottom: 8px;
+        }
+        
+        .code-block {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            margin: 15px 0;
+            border-left: 4px solid #e74c3c;
+        }
+        
+        .code-block .comment {
+            color: #95a5a6;
+        }
+        
+        .highlight {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+        }
+        
+        .partition-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        .partition-table th, .partition-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        
+        .partition-table th {
+            background: #3498db;
+            color: white;
+        }
+        
+        .partition-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        
+        .exercise {
+            background: #e8f5e8;
+            border-left: 4px solid #27ae60;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        
+        .exercise h3 {
+            color: #27ae60;
+            margin-top: 0;
+        }
+        
+        .summary {
+            background: #fdf2e9;
+            border: 1px solid #f39c12;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        
+        .resources {
+            background: #f4f4f4;
+            padding: 20px;
+            border-radius: 5px;
+            margin-top: 30px;
+        }
+        
+        .toc {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        
+        .toc ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        
+        .toc li {
+            margin-bottom: 5px;
+        }
+        
+        .toc a {
+            text-decoration: none;
+            color: #2980b9;
+        }
+        
+        .toc a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Jour 02 - Installation de Linux</h1>
+    </div>
+
+    <div class="content">
+        <div class="toc">
+            <h2>Table des matières</h2>
+            <ul>
+                <li><a href="#objectifs">Objectifs d'apprentissage</a></li>
+                <li><a href="#prerequis">Prérequis</a></li>
+                <li><a href="#preparation">1. Préparation à l'installation</a></li>
+                <li><a href="#methodes">2. Méthodes d'installation</a></li>
+                <li><a href="#processus">3. Processus d'installation pas à pas</a></li>
+                <li><a href="#postinstall">4. Configuration post-installation</a></li>
+                <li><a href="#depannage">5. Dépannage d'installation</a></li>
+                <li><a href="#exercices">Exercices pratiques</a></li>
+                <li><a href="#resume">Résumé des points clés</a></li>
+                <li><a href="#ressources">Ressources supplémentaires</a></li>
+            </ul>
+        </div>
+
+        <div class="objectives" id="objectifs">
+            <h2>Objectifs d'apprentissage</h2>
+            <p>À la fin de cette journée, les participants seront capables de :</p>
+            <ul>
+                <li>Identifier les considérations préalables à l'installation d'un système Linux</li>
+                <li>Préparer un environnement d'installation avec différentes méthodes</li>
+                <li>Réaliser une installation complète d'une distribution Linux</li>
+                <li>Configurer correctement les éléments post-installation essentiels</li>
+            </ul>
+        </div>
+
+        <div class="prerequisites" id="prerequis">
+            <h2>Prérequis</h2>
+            <ul>
+                <li>Connaissances de base sur Linux (Jour 1)</li>
+                <li>Notions élémentaires sur le partitionnement de disques</li>
+                <li>Compréhension basique du matériel informatique</li>
+            </ul>
+        </div>
+
+        <div class="section" id="preparation">
+            <h1>1. Préparation à l'installation</h1>
+            
+            <h2>1.1 Choix de la distribution</h2>
+            <p>Critères à considérer lors du choix d'une distribution pour un environnement spécifique :</p>
+            <ul>
+                <li><strong>Usage prévu :</strong> serveur, station de travail, développement, etc.</li>
+                <li><strong>Support matériel :</strong> compatibilité avec les composants spécifiques</li>
+                <li><strong>Durée de support :</strong> versions LTS (Long Term Support) vs versions standard</li>
+                <li><strong>Environnement de bureau :</strong> GNOME, KDE, Xfce, etc. (pour les installations desktop)</li>
+                <li><strong>Stabilité vs nouveauté :</strong> distributions conservatrices vs rolling release</li>
+            </ul>
+            
+            <div class="highlight">
+                <p><strong>Pour cette formation, nous utiliserons principalement :</strong></p>
+                <ul>
+                    <li>Ubuntu Server ou Debian pour les environnements serveur</li>
+                    <li>Ubuntu Desktop pour les environnements graphiques</li>
+                </ul>
+            </div>
+
+            <h2>1.2 Vérification des prérequis matériels</h2>
+            <ul>
+                <li><strong>Processeur :</strong> architecture compatible (x86_64/AMD64, ARM64, etc.)</li>
+                <li><strong>Mémoire RAM minimale :</strong>
+                    <ul>
+                        <li>Serveur : 512 MB (minimal), 1 GB (recommandé)</li>
+                        <li>Bureau : 2 GB (minimal), 4 GB (recommandé)</li>
+                    </ul>
+                </li>
+                <li><strong>Espace disque :</strong>
+                    <ul>
+                        <li>Serveur : 10 GB minimum</li>
+                        <li>Bureau : 20 GB minimum</li>
+                    </ul>
+                </li>
+                <li><strong>Périphériques :</strong> vérification de la compatibilité des cartes réseau, cartes graphiques, etc.</li>
+            </ul>
+
+            <h2>1.3 Planification du partitionnement</h2>
+            
+            <h3>Schémas de partitionnement courants :</h3>
+            
+            <table class="partition-table">
+                <thead>
+                    <tr>
+                        <th>Schéma</th>
+                        <th>Partitions</th>
+                        <th>Taille recommandée</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td rowspan="1"><strong>Simple</strong></td>
+                        <td>/ (root)</td>
+                        <td>Tout l'espace disponible</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="3"><strong>Standard</strong></td>
+                        <td>/boot</td>
+                        <td>500 MB</td>
+                    </tr>
+                    <tr>
+                        <td>swap</td>
+                        <td>1-2× la RAM</td>
+                    </tr>
+                    <tr>
+                        <td>/ (root)</td>
+                        <td>Reste de l'espace</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="6"><strong>Avancé</strong></td>
+                        <td>/boot</td>
+                        <td>500 MB</td>
+                    </tr>
+                    <tr>
+                        <td>swap</td>
+                        <td>1-2× la RAM</td>
+                    </tr>
+                    <tr>
+                        <td>/ (root)</td>
+                        <td>20-30 GB</td>
+                    </tr>
+                    <tr>
+                        <td>/home</td>
+                        <td>Pour les données utilisateurs</td>
+                    </tr>
+                    <tr>
+                        <td>/var</td>
+                        <td>Pour les logs, caches, etc.</td>
+                    </tr>
+                    <tr>
+                        <td>/tmp</td>
+                        <td>Pour les fichiers temporaires</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Considérations sur les systèmes de fichiers :</h3>
+            <ul>
+                <li><strong>ext4 :</strong> standard, stable et éprouvé</li>
+                <li><strong>XFS :</strong> performant pour les gros fichiers</li>
+                <li><strong>Btrfs :</strong> moderne avec snapshots et autres fonctionnalités avancées</li>
+                <li><strong>ZFS :</strong> avancé avec gestion de volumes intégrée (non inclus par défaut dans certaines distributions)</li>
+            </ul>
+        </div>
+
+        <div class="section" id="methodes">
+            <h1>2. Méthodes d'installation</h1>
+            
+            <h2>2.1 Installation physique</h2>
+            <p>Processus pour une installation sur matériel physique :</p>
+            <ol>
+                <li>Téléchargement de l'image ISO depuis le site officiel de la distribution</li>
+                <li>Vérification de l'intégrité (sommes MD5/SHA)</li>
+                <li>Création d'un média d'installation (USB, DVD)</li>
+                <li>Configuration du BIOS/UEFI pour démarrer sur ce média</li>
+                <li>Démarrage sur le média d'installation</li>
+            </ol>
+
+            <h3>Création d'une clé USB bootable</h3>
+            <p>Outils selon le système d'exploitation hôte :</p>
+            <ul>
+                <li><strong>Linux :</strong> dd, Etcher, UNetbootin</li>
+                <li><strong>Windows :</strong> Rufus, Etcher, UNetbootin</li>
+                <li><strong>macOS :</strong> Etcher, dd, UNetbootin</li>
+            </ul>
+
+            <p>Exemple avec dd sous Linux :</p>
+            <div class="code-block">
+<span class="comment"># Remplacer sdX par le périphérique correspondant à votre clé USB</span>
+sudo dd if=ubuntu-22.04-server-amd64.iso of=/dev/sdX bs=4M status=progress
+            </div>
+
+            <h2>2.2 Installation virtuelle</h2>
+            <p>Options de virtualisation pour l'apprentissage et les tests :</p>
+            <ul>
+                <li><strong>VirtualBox :</strong> gratuit, multi-plateforme, facile à utiliser</li>
+                <li><strong>VMware :</strong> versions gratuites et payantes, très répandu en entreprise</li>
+                <li><strong>KVM/QEMU :</strong> natif sous Linux, performant</li>
+                <li><strong>Hyper-V :</strong> natif sous Windows Server et Windows 10/11 Pro</li>
+            </ul>
+
+            <div class="highlight">
+                <h3>Avantages de la virtualisation pour l'apprentissage :</h3>
+                <ul>
+                    <li>Isolation des systèmes</li>
+                    <li>Possibilité de créer des snapshots</li>
+                    <li>Facilité de réinitialisation</li>
+                    <li>Testez plusieurs distributions sans réinstallation physique</li>
+                </ul>
+            </div>
+
+            <h2>2.3 Installation automatisée</h2>
+            <p>Pour les déploiements à grande échelle :</p>
+            <ul>
+                <li><strong>Kickstart</strong> (Red Hat, CentOS, Fedora)</li>
+                <li><strong>Preseed</strong> (Debian, Ubuntu)</li>
+                <li><strong>AutoYaST</strong> (SUSE)</li>
+                <li><strong>Cloud-init</strong> (pour les environnements cloud)</li>
+            </ul>
+        </div>
+
+        <div class="section" id="processus">
+            <h1>3. Processus d'installation pas à pas</h1>
+            
+            <h2>3.1 Démarrage sur le média d'installation</h2>
+            <ul>
+                <li>Sélection de la langue</li>
+                <li>Options d'installation (installation standard, minimale, etc.)</li>
+                <li>Options d'accessibilité si nécessaire</li>
+            </ul>
+
+            <h2>3.2 Configuration de base</h2>
+            <ul>
+                <li>Langue et disposition du clavier</li>
+                <li>Fuseau horaire</li>
+                <li>Connexion réseau (avec ou sans DHCP)</li>
+            </ul>
+
+            <h2>3.3 Partitionnement du disque</h2>
+            <ul>
+                <li>Manuel vs automatique</li>
+                <li>Types de partitionnement (standard, LVM, crypté)</li>
+                <li>Configuration des points de montage</li>
+                <li>Formatage des partitions</li>
+            </ul>
+
+            <h2>3.4 Création d'utilisateurs</h2>
+            <ul>
+                <li>Configuration du compte root (ou désactivation selon la distribution)</li>
+                <li>Création du premier utilisateur administratif</li>
+                <li>Définition des mots de passe sécurisés</li>
+            </ul>
+
+            <h2>3.5 Sélection des paquets</h2>
+            <ul>
+                <li>Installation minimale vs complète</li>
+                <li>Sélection de l'environnement de bureau (pour les installations desktop)</li>
+                <li>Sélection des services serveur (SSH, serveur web, etc.)</li>
+            </ul>
+
+            <h2>3.6 Installation du système</h2>
+            <ul>
+                <li>Copie des fichiers</li>
+                <li>Installation du chargeur de démarrage (GRUB2)</li>
+                <li>Configuration de base</li>
+            </ul>
+        </div>
+
+        <div class="section" id="postinstall">
+            <h1>4. Configuration post-installation</h1>
+
+            <h2>4.1 Mise à jour du système</h2>
+            <div class="code-block">
+<span class="comment"># Sur Debian/Ubuntu</span>
+sudo apt update
+sudo apt upgrade
+
+<span class="comment"># Sur RHEL/CentOS/Fedora</span>
+sudo dnf update
+            </div>
+
+            <h2>4.2 Installation des pilotes additionnels</h2>
+            <ul>
+                <li>Pilotes propriétaires vs open source</li>
+                <li>Pilotes graphiques (NVIDIA, AMD)</li>
+                <li>Pilotes pour matériel spécifique (Wi-Fi, imprimantes, etc.)</li>
+            </ul>
+
+            <h2>4.3 Configuration du réseau</h2>
+            <ul>
+                <li>Attribution d'une adresse IP statique (si nécessaire)</li>
+                <li>Configuration du nom d'hôte</li>
+                <li>Configuration DNS</li>
+            </ul>
+
+            <h2>4.4 Activation/désactivation des services</h2>
+            <div class="code-block">
+<span class="comment"># Avec systemd</span>
+sudo systemctl status [service]
+sudo systemctl enable [service]
+sudo systemctl disable [service]
+            </div>
+
+            <h2>4.5 Installation des outils essentiels</h2>
+            <p>Packages de base recommandés pour l'administration :</p>
+            <div class="code-block">
+<span class="comment"># Sur Debian/Ubuntu</span>
+sudo apt install vim htop net-tools dnsutils curl wget git
+            </div>
+        </div>
+
+        <div class="section" id="depannage">
+            <h1>5. Dépannage d'installation</h1>
+
+            <h2>5.1 Problèmes courants et solutions</h2>
+            <ul>
+                <li>Erreurs de démarrage après installation</li>
+                <li>Problèmes avec GRUB</li>
+                <li>Problèmes de reconnaissance matérielle</li>
+                <li>Problèmes de résolution d'écran</li>
+            </ul>
+
+            <h2>5.2 Utilisation du mode rescue/recovery</h2>
+            <ul>
+                <li>Accès au mode rescue</li>
+                <li>Réparation du chargeur de démarrage</li>
+                <li>Récupération de fichiers</li>
+                <li>Réinitialisation de mot de passe</li>
+            </ul>
+
+            <h2>5.3 Journaux d'installation</h2>
+            <ul>
+                <li>Localisation des logs d'installation</li>
+                <li>Analyse des erreurs courantes</li>
+            </ul>
+        </div>
+
+        <div class="section" id="exercices">
+            <h1>Exercices pratiques</h1>
+
+            <div class="exercise">
+                <h3>Exercice 1 : Installation virtuelle</h3>
+                <ol>
+                    <li>Installez VirtualBox (ou autre solution de virtualisation)</li>
+                    <li>Téléchargez l'ISO d'Ubuntu Server 22.04 LTS</li>
+                    <li>Créez une machine virtuelle avec les paramètres appropriés</li>
+                    <li>Réalisez l'installation complète en suivant les étapes du cours</li>
+                </ol>
+            </div>
+
+            <div class="exercise">
+                <h3>Exercice 2 : Partitionnement avancé</h3>
+                <p>Dans une seconde machine virtuelle, réalisez une installation avec un schéma de partitionnement avancé :</p>
+                <ul>
+                    <li>Partition /boot (500 MB)</li>
+                    <li>Partition swap (2 GB)</li>
+                    <li>Partition / (root) (15 GB)</li>
+                    <li>Partition /home (reste de l'espace)</li>
+                </ul>
+            </div>
+
+            <div class="exercise">
+                <h3>Exercice 3 : Post-installation</h3>
+                <p>Après l'installation :</p>
+                <ol>
+                    <li>Mettez à jour le système</li>
+                    <li>Installez les outils essentiels mentionnés dans le cours</li>
+                    <li>Vérifiez l'état des services avec systemctl</li>
+                    <li>Configurez le réseau pour utiliser une adresse IP statique</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="summary" id="resume">
+            <h1>Résumé des points clés</h1>
+            <ul>
+                <li>L'installation de Linux nécessite une préparation adéquate (choix de distribution, vérification matérielle)</li>
+                <li>Le partitionnement est une étape cruciale qui impacte la sécurité et les performances</li>
+                <li>La virtualisation offre un environnement sécurisé pour l'apprentissage</li>
+                <li>La configuration post-installation est essentielle pour un système sécurisé et fonctionnel</li>
+            </ul>
+        </div>
+
+        <div class="resources" id="ressources">
+            <h1>Ressources supplémentaires</h1>
+            <ul>
+                <li>Documentation officielle Ubuntu</li>
+                <li>Guide d'installation Debian</li>
+                <li>Guide de partitionnement ArchWiki</li>
+                <li>VirtualBox User Manual</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

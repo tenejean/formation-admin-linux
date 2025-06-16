@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jour 17 - Sécurité de base sous Linux</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .header h1 {
+            color: #2c3e50;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .header .subtitle {
+            color: #7f8c8d;
+            font-size: 1.2em;
+            font-weight: 300;
+        }
+        
+        .course-info {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .info-card {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.3s ease;
+            border-left: 4px solid #667eea;
+        }
+        
+        .info-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .info-card h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+        
+        .info-card p {
+            color: #6c757d;
+            font-weight: 500;
+        }
+        
+        .section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .section h2 {
+            color: #2c3e50;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .section h3 {
+            color: #34495e;
+            font-size: 1.4em;
+            margin: 25px 0 15px 0;
+            padding-left: 15px;
+            border-left: 4px solid #764ba2;
+        }
+        
+        .section h4 {
+            color: #2c3e50;
+            font-size: 1.2em;
+            margin: 20px 0 10px 0;
+            font-weight: 600;
+        }
+        
+        .code-block {
+            background: #2d3748;
+            color: #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            overflow-x: auto;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+            border: 1px solid #4a5568;
+        }
+        
+        .command {
+            color: #68d391;
+            font-weight: bold;
+        }
+        
+        .comment {
+            color: #a0aec0;
+            font-style: italic;
+        }
+        
+        .warning {
+            background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+            border: 1px solid #ffc107;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 5px solid #ffc107;
+        }
+        
+        .warning strong {
+            color: #856404;
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+        
+        .tip {
+            background: linear-gradient(135deg, #d1ecf1, #b8daff);
+            border: 1px solid #17a2b8;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 5px solid #17a2b8;
+        }
+        
+        .tip strong {
+            color: #0c5460;
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+        
+        .exercise {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            border: 1px solid #28a745;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 25px 0;
+            border-left: 5px solid #28a745;
+        }
+        
+        .exercise h4 {
+            color: #155724;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+        
+        .objectives {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 25px 0;
+            border-left: 5px solid #667eea;
+        }
+        
+        .objectives h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            border: none;
+            padding: 0;
+        }
+        
+        .objectives ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .objectives li {
+            margin: 10px 0;
+            padding-left: 30px;
+            position: relative;
+        }
+        
+        .objectives li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #28a745;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+            margin: 20px 0;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        th {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .footer {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            margin-top: 30px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .footer p {
+            color: #6c757d;
+            margin: 5px 0;
+        }
+        
+        .icon {
+            font-size: 1.5em;
+            margin-right: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .section {
+                padding: 20px;
+            }
+            
+            .code-block {
+                font-size: 0.8em;
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔒 Jour 17 - Sécurité de base sous Linux</h1>
+            <p class="subtitle">Formation Administration Système Linux</p>
+        </div>
+
+        <div class="course-info">
+            <div class="info-card">
+                <h3>📚 Module</h3>
+                <p>Sécurité Système</p>
+            </div>
+            <div class="info-card">
+                <h3>⏱️ Durée</h3>
+                <p>8 heures</p>
+            </div>
+            <div class="info-card">
+                <h3>📖 Niveau</h3>
+                <p>Intermédiaire</p>
+            </div>
+            <div class="info-card">
+                <h3>👨‍🏫 Formateur</h3>
+                <p>Jean Tene</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="objectives">
+                <h3>🎯 Objectifs pédagogiques</h3>
+                <ul>
+                    <li>Comprendre les principes fondamentaux de la sécurité sous Linux</li>
+                    <li>Maîtriser la gestion des utilisateurs et groupes sécurisés</li>
+                    <li>Configurer et utiliser sudo efficacement</li>
+                    <li>Implémenter les bonnes pratiques de sécurité des mots de passe</li>
+                    <li>Sécuriser les services système essentiels</li>
+                    <li>Comprendre et appliquer les principes de moindre privilège</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2><span class="icon">🔐</span>1. Introduction à la sécurité Linux</h2>
+            
+            <h3>Définition et importance</h3>
+            <p>La sécurité sous Linux consiste à protéger le système d'exploitation, les données et les services contre les accès non autorisés, les modifications malveillantes et les compromissions. Linux, de par sa conception multi-utilisateur, offre des mécanismes de sécurité robustes qu'il convient de bien comprendre et configurer.</p>
+            
+            <h3>Principes fondamentaux de sécurité</h3>
+            <h4>1. Principe de moindre privilège</h4>
+            <p>Chaque utilisateur et processus ne doit avoir que les permissions minimales nécessaires pour accomplir sa tâche.</p>
+            
+            <h4>2. Défense en profondeur</h4>
+            <p>Utilisation de plusieurs couches de sécurité pour protéger le système.</p>
+            
+            <h4>3. Fail-safe defaults</h4>
+            <p>Par défaut, l'accès doit être refusé sauf autorisation explicite.</p>
+            
+            <div class="tip">
+                <strong>💡 Conseil :</strong>
+                <p>La sécurité n'est pas un état mais un processus continu qui nécessite une maintenance et une mise à jour régulières.</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2><span class="icon">👥</span>2. Gestion sécurisée des utilisateurs</h2>
+            
+            <h3>Comptes utilisateur et sécurité</h3>
+            <p>La gestion des comptes utilisateur est la première ligne de défense d'un système Linux. Elle implique la création, la modification et la suppression sécurisées des comptes.</p>
+            
+            <h3>Fichiers de configuration importants</h3>
+            
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Fichier</th>
+                            <th>Description</th>
+                            <th>Permissions recommandées</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>/etc/passwd</td>
+                            <td>Informations des comptes utilisateur</td>
+                            <td>644 (rw-r--r--)</td>
+                        </tr>
+                        <tr>
+                            <td>/etc/shadow</td>
+                            <td>Mots de passe chiffrés</td>
+                            <td>640 (rw-r-----)</td>
+                        </tr>
+                        <tr>
+                            <td>/etc/group</td>
+                            <td>Informations des groupes</td>
+                            <td>644 (rw-r--r--)</td>
+                        </tr>
+                        <tr>
+                            <td>/etc/gshadow</td>
+                            <td>Mots de passe des groupes</td>
+                            <td>640 (rw-r-----)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>Création d'utilisateurs sécurisés</h3>
+            <div class="code-block">
+<span class="comment"># Créer un utilisateur avec des paramètres sécurisés</span>
+<span class="command">sudo useradd -m -s /bin/bash -G sudo utilisateur</span>
+
+<span class="comment"># Définir une politique de mot de passe forte</span>
+<span class="command">sudo passwd utilisateur</span>
+
+<span class="comment"># Forcer le changement de mot de passe à la première connexion</span>
+<span class="command">sudo chage -d 0 utilisateur</span>
+
+<span class="comment"># Définir l'expiration du compte</span>
+<span class="command">sudo chage -E 2024-12-31 utilisateur</span>
+            </div>
+
+            <h3>Désactivation et suppression sécurisées</h3>
+            <div class="code-block">
+<span class="comment"># Désactiver temporairement un compte</span>
+<span class="command">sudo usermod -L utilisateur</span>
+<span class="command">sudo usermod -s /bin/false utilisateur</span>
+
+<span class="comment"># Réactiver un compte</span>
+<span class="command">sudo usermod -U utilisateur</span>
+<span class="command">sudo usermod -s /bin/bash utilisateur</span>
+
+<span class="comment"># Supprimer un utilisateur et ses données</span>
+<span class="command">sudo userdel -r utilisateur</span>
+            </div>
+
+            <div class="warning">
+                <strong>⚠️ Attention :</strong>
+                <p>Toujours vérifier les processus en cours d'exécution par un utilisateur avant de le supprimer. Utilisez <code>ps -u utilisateur</code> et <code>pkill -u utilisateur</code> si nécessaire.</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2><span class="icon">🔑</span>3. Configuration et utilisation de sudo</h2>
+            
+            <h3>Qu'est-ce que sudo ?</h3>
+            <p>Sudo (Super User DO) permet à des utilisateurs autorisés d'exécuter des commandes en tant qu'un autre utilisateur (généralement root) de manière contrôlée et traçable.</p>
+            
+            <h3>Avantages de sudo</h3>
+            <ul>
+                <li><strong>Traçabilité :</strong> Toutes les commandes sont loggées</li>
+                <li><strong>Granularité :</strong> Permissions spécifiques par utilisateur/commande</li>
+                <li><strong>Sécurité :</strong> Pas besoin de partager le mot de passe root</li>
+                <li><strong>Temporalité :</strong> Authentification temporaire</li>
+            </ul>
+            
+            <h3>Configuration du fichier sudoers</h3>
+            <div class="code-block">
+<span class="comment"># Éditer le fichier sudoers de manière sécurisée</span>
+<span class="command">sudo visudo</span>
+            </div>
+
+            <h3>Syntaxe du fichier sudoers</h3>
+            <div class="code-block">
+<span class="comment"># Format : utilisateur machine = (runas) commandes</span>
+
+<span class="comment"># Permettre à l'utilisateur jean d'exécuter toutes les commandes</span>
+jean ALL=(ALL:ALL) ALL
+
+<span class="comment"># Permettre au groupe admin d'exécuter toutes les commandes sans mot de passe</span>
+%admin ALL=(ALL) NOPASSWD: ALL
+
+<span class="comment"># Permettre à marie d'exécuter seulement systemctl</span>
+marie ALL=(ALL) /bin/systemctl
+
+<span class="comment"># Permettre à l'utilisateur backup d'exécuter des commandes spécifiques</span>
+backup ALL=(ALL) NOPASSWD: /bin/tar, /bin/gzip, /usr/bin/rsync
+            </div>
+
+            <h3>Alias et groupes dans sudoers</h3>
+            <div class="code-block">
+<span class="comment"># Définir des alias d'utilisateurs</span>
+User_Alias ADMINS = jean, marie, pierre
+
+<span class="comment"># Définir des alias de commandes</span>
+Cmnd_Alias NETWORKING = /sbin/route, /sbin/ifconfig, /bin/ping
+Cmnd_Alias SOFTWARE = /bin/rpm, /usr/bin/up2date, /usr/bin/yum
+
+<span class="comment"># Définir des alias d'hôtes</span>
+Host_Alias FILESERVERS = fs1, fs2, fs3
+
+<span class="comment"># Utiliser les alias</span>
+ADMINS FILESERVERS = (ALL) NETWORKING, SOFTWARE
+            </div>
+
+            <div class="exercise">
+                <h4>🔧 Exercice pratique : Configuration sudo</h4>
+                <ol>
+                    <li>Créez un utilisateur "webadmin"</li>
+                    <li>Configurez sudo pour que cet utilisateur puisse uniquement :
+                        <ul>
+                            <li>Redémarrer le service Apache</li>
+                            <li>Consulter les logs dans /var/log/apache2/</li>
+                            <li>Éditer la configuration d'Apache</li>
+                        </ul>
+                    </li>
+                    <li>Testez la configuration</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2><span class="icon">🔒</span>4. Sécurité des mots de passe</h2>
+            
+            <h3>Politiques de mots de passe</h3>
+            <p>Une politique de mot de passe robuste est essentielle pour la sécurité du système. Elle définit les règles de complexité, d'expiration et d'historique des mots de passe.</p>
+            
+            <h3>Configuration avec PAM (Pluggable Authentication Modules)</h3>
+            <p>PAM permet de configurer finement les politiques d'authentification et de mots de passe.</p>
+            
+            <h4>Installation du module pam_pwquality</h4>
+            <div class="code-block">
+<span class="comment"># Ubuntu/Debian</span>
+<span class="command">sudo apt-get install libpam-pwquality</span>
+
+<span class="comment"># CentOS/RHEL</span>
+<span class="command">sudo yum install libpwquality</span>
+            </div>
+
+            <h4>Configuration dans /etc/security/pwquality.conf</h4>
+            <div class="code-block">
+<span class="comment"># Longueur minimale du mot de passe</span>
+minlen = 12
+
+<span class="comment"># Nombre minimum de caractères minuscules</span>
+minclass = 3
+
+<span class="comment"># Nombre minimum de caractères différents</span>
+difok = 8
+
+<span class="comment"># Vérification contre le dictionnaire</span>
+dictcheck = 1
+
+<span class="comment"># Nombre maximum de caractères consécutifs identiques</span>
+maxrepeat = 2
+
+<span class="comment"># Nombre maximum de caractères consécutifs de même classe</span>
+maxclasrepeat = 3
+            </div>
+
+            <h3>Configuration de l'expiration des mots de passe</h3>
+            <div class="code-block">
+<span class="comment"># Éditer /etc/login.defs</span>
+<span class="command">sudo nano /etc/login.defs</span>
+
+<span class="comment"># Paramètres d'expiration</span>
+PASS_MAX_DAYS   90    # Durée maximale en jours
+PASS_MIN_DAYS   7     # Durée minimale entre changements
+PASS_WARN_AGE   7     # Avertissement avant expiration
+            </div>
+
+            <h3>Gestion des mots de passe avec chage</h3>
+            <div class="code-block">
+<span class="comment"># Voir les informations d'expiration d'un utilisateur</span>
+<span class="command">sudo chage -l utilisateur</span>
+
+<span class="comment"># Définir l'expiration du mot de passe</span>
+<span class="command">sudo chage -M 90 utilisateur</span>
+
+<span class="comment"># Forcer le changement au prochain login</span>
+<span class="command">sudo chage -d 0 utilisateur</span>
+
+<span class="comment"># Définir une date d'expiration du compte</span>
+<span class="command">sudo chage -E 2024-12-31 utilisateur</span>
+            </div>
+
+            <div class="tip">
+                <strong>💡 Conseil :</strong>
+                <p>Utilisez des gestionnaires de mots de passe comme <code>pass</code> ou encouragez l'utilisation d'authentification à deux facteurs pour renforcer la sécurité.</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2><span class="icon">⚙️</span>5. Sécurisation des services système</h2>
+            
+            <h3>Principe de minimisation</h3>
+            <p>Un système sécurisé ne doit exécuter que les services strictement nécessaires. Chaque service supplémentaire représente une surface d'attaque potentielle.</p>
+            
+            <h3>Audit des services actifs</h3>
+            <div class="code-block">
+<span class="comment"># Lister tous les services actifs</span>
+<span class="command">sudo systemctl list-units --type=service --state=active</span>
+
+<span class="comment"># Voir les services qui démarrent automatiquement</span>
+<span class="command">sudo systemctl list-unit-files --type=service --state=enabled</span>
+
+<span class="comment"># Vérifier les ports en écoute</span>
+<span class="command">sudo netstat -tlnp</span>
+<span class="command">sudo ss -tlnp</span>
+            </div>
+
+            <h3>Désactivation des services inutiles</h3>
+            <div class="code-block">
+<span class="comment"># Arrêter un service</span>
+<span class="command">sudo systemctl stop nom_service</span>
+
+<span class="comment"># Désactiver le démarrage automatique</span>
+<span class="command">sudo systemctl disable nom_service</span>
+
+<span class="comment"># Masquer un service pour empêcher son démarrage</span>
+<span class="command">sudo systemctl mask nom_service</span>
+
+<span class="comment"># Vérifier le statut d'un service</span>
+<span class="command">sudo systemctl status nom_service</span>
+            </div>
+
+            <h3>Sécurisation de SSH</h3>
+            <p>SSH étant souvent le principal point d'entrée distant, sa sécurisation est critique.</p>
+            
+            <div class="code-block">
+<span class="comment"># Éditer la configuration SSH</span>
+<span class="command">sudo nano /etc/ssh/sshd_config</span>
+
+<span class="comment"># Paramètres de sécurité recommandés :</span>
+Port 2022                          # Changer le port par défaut
+PermitRootLogin no                 # Interdire la connexion root directe
+PasswordAuthentication yes         # Garder temporairement pour les clés
+PubkeyAuthentication yes           # Autoriser l'authentification par clés
+MaxAuthTries 3                     # Limiter les tentatives
+ClientAliveInterval 300            # Timeout de session
+ClientAliveCountMax 2              # Nombre de pings avant déconnexion
+X11Forwarding no                   # Désactiver le forwarding X11
+AllowUsers jean marie              # Autoriser seulement certains utilisateurs
+            </div>
+
+            <h3>Authentification par clés SSH</h3>
+            <div class="code-block">
+<span class="comment"># Générer une paire de clés SSH (sur le client)</span>
+<span class="command">ssh-keygen -t rsa -b 4096 -C "votre.email@exemple.com"</span>
+
+<span class="comment"># Copier la clé publique vers le serveur</span>
+<span class="command">ssh-copy-id -i ~/.ssh/id_rsa.pub utilisateur@serveur</span>
+
+<span class="comment"># Ou manuellement</span>
+<span class="command">cat ~/.ssh/id_rsa.pub | ssh utilisateur@serveur "mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys"</span>
+
+<span class="comment"># Définir les bonnes permissions</span>
+<span class="command">chmod 700 ~/.ssh</span>
+<span class="command">chmod 600 ~/.ssh/authorized_keys</span>
+            </div>
+
+            <div class="warning">
+                <strong>⚠️ Important :</strong>
+                <p>Après avoir configuré l'authentification par clés, désactivez l'authentification par mot de passe en définissant <code>PasswordAuthentication no</code> dans /etc/ssh/sshd_config.</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2><span class="icon">🛡️</span>6. Surveillance et logging de sécurité</h2>
+            
+            <h3>Logs de sécurité importants</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Fichier de log</th>
+                            <th>Description</th>
+                            <th>Éléments à surveiller</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>/var/log/auth.log</td>
+                            <td>Authentifications système</td>
+                            <td>Échecs de connexion, élévations sudo</td>
+                        </tr>
+                        <tr>
+                            <td>/var/log/secure</td>
+                            <td>Sécurité (CentOS/RHEL)</td>
+                            <td>SSH, su, sudo</td>
+                        </tr>
+                        <tr>
+                            <td>/var/log/lastlog</td>
+                            <td>Dernières connexions</td>
+                            <td>Connexions inhabituelles</td>
+                        </tr>
+                        <tr>
+                            <td>/var/log/wtmp</td>
+                            <td>Historique des connexions</td>
+                            <td>Sessions utilisateur</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>Commandes de surveillance</h3>
+            <div class="code-block">
+<span class="comment"># Voir les dernières connexions</span>
+<span class="command">last</span>
+<span class="command">lastb</span>  <span class="comment"># Tentatives échouées</span>
+
+<span class="comment"># Utilisateurs actuellement connectés</span>
+<span class="command">who</span>
+<span class="command">w</span>
+
+<span class="comment"># Surveiller les tentatives de connexion échouées</span>
+<span class="command">sudo grep "Failed password" /var/log/auth.log</span>
+
+<span class="comment"># Surveiller les utilisations de sudo</span>
+<span class="command">sudo grep "sudo:" /var/log/auth.log</span>
+
+<span class="comment"># Analyser les connexions par adresse IP</span>
+<span class="command">sudo grep "sshd" /var/log/auth.log | grep "Accepted" | awk '{print $11}' | sort | uniq -c</span>
+            </div>
+
+            <h3>Configuration de rsyslog pour la sécurité</h3>
+            <div class="code-block">
+<span class="comment"># Éditer la configuration rsyslog</span>
+<span class="command">sudo nano /etc/rsyslog.d/50-security.conf</span>
+
+<span class="comment"># Contenu du fichier :</span>
+# Logs d'authentification séparés
+auth,authpriv.*                 /var/log/auth.log
+auth,authpriv.notice           /var/log/auth-notice.log
+
+# Logs sudo séparés
+local0.*                       /var/log/sudo.log
+
+# Logs des échecs de sécurité
+*.emerg                        /var/log/security-emergency.log
+            </div>
+
+            <h3>Rotation des logs de sécurité</h3>
+            <div class="code-block">
+<span class="comment"># Créer un fichier de configuration logrotate</span>
+<span class="command">sudo nano /etc/logrotate.d/security-logs</span>
+
+<span class="comment"># Contenu :</span>
+/var/log/auth.log /var/log/sudo.log {
+    weekly
+    rotate 52
+    compress
+    delaycompress
+    missingok
+    notifempty
+    create 640 root adm
+    postrotate
+        systemctl reload rsyslog
+    endscript
+}
+            </div>
+        </div>
+
+        <div class="section">
+            <h2><span class="icon">🔍</span>7. Détection d'intrusion et alertes</h2>
+            
+            <h3>Installation et configuration de fail2ban</h3>
+            <p>Fail2ban est un outil qui analyse les logs et bannit temporairement les adresses IP suspectes.</p>
+            
+            <div class="code-block">
+<span class="comment"># Installation</span>
+<span class="command">sudo apt-get install fail2ban</span>  <span class="comment"># Ubuntu/Debian</span>
+<span class="command">sudo yum install fail2ban</span>      <span class="comment"># CentOS/RHEL</span>
+
+<span class="comment"># Démarrer et activer le service</span>
+<span class="command">sudo systemctl start fail2ban</span>
+<span class="command">sudo systemctl enable fail2ban</span>
+            </div>
+
+            <h3>Configuration de fail2ban</h3>
+            <div class="code-block">
+<span class="comment"># Créer un fichier de configuration local</span>
+<span class="command">sudo nano /etc/fail2ban/jail.local</span>
+
+<span class="comment"># Configuration de base :</span>
+[DEFAULT]
+bantime = 3600          # Durée de bannissement (1 heure)
+findtime = 600          # Fenêtre de temps pour compter les échecs
+maxretry = 3            # Nombre d'échecs avant bannissement
+backend = systemd       # Backend de lecture des logs
+
+# Configuration email (optionnel)
+destemail = admin@exemple.com
+sendername = Fail2Ban
+mta = sendmail
+
+[sshd]
+enabled = true
+port = ssh,2022
+filter = sshd
+logpath = /var/log/auth.log
+maxretry = 3
+bantime = 3600
+
+[apache-auth]
+enabled = true
+filter = apache-auth
+logpath = /var/log/apache2/error.log
+maxretry = 6
+            </div>
+
+            <h3>Gestion de fail2ban</h3>
+            <div class="code-block">
+<span class="comment"># Voir le statut général</span>
+<span class="command">sudo fail2ban-client status</span>
+
+<span class="comment"># Statut d'une jail spécifique</span>
+<span class="command">sudo fail2ban-client status sshd</span>
+
+<span class="comment"># Débannir une adresse IP</span>
+<span class="command">sudo fail2ban-client set sshd unbanip 192.168.1.100</span>
+
+<span class="comment"># Bannir manuellement une IP</span>
+<span class="command">sudo fail2ban-client set sshd banip 192.168.1.100</span>
+            </div>
+
+            <h3>Script de surveillance personnalisé</h3>
+            <div class="code-block">
+<span class="command">sudo nano /usr/local/bin/security-check.sh</span>
+
+<span class="comment">#!/bin/bash</span>
+<span class="comment"># Script de vérification de sécurité quotidien</span>
+
+LOG_FILE="/var/log/security-check.log"
+DATE=$(date '+%Y-%m-%d %H:%M:%S')
+
+echo "=== Vérification de sécurité - $DATE ===" >> $LOG_FILE
+
+<span class="comment"># Vérifier les connexions root</span>
+ROOT_LOGINS=$(grep "root" /var/log/auth.log | grep "$(date '+%b %d')" | wc -l)
+if [ $ROOT_LOGINS -gt 0 ]; then
+    echo "ALERTE: $ROOT_LOGINS tentatives de connexion root aujourd'hui" >> $LOG_FILE
+fi
+
+<span class="comment"># Vérifier les nouveaux utilisateurs</span>
+NEW_USERS=$(grep "new user" /var/log/auth.log | grep "$(date '+%b %d')" | wc -l)
+if [ $NEW_USERS -gt 0 ]; then
+    echo "INFO: $NEW_USERS nouveaux utilisateurs créés aujourd'hui" >> $LOG_FILE
+fi
+
+<span class="comment"># Vérifier l'espace disque</span>
+DISK_USAGE=$(df / | awk 'NR==2 {print $5}' | sed 's/%//')
+if [ $DISK_USAGE -gt 90 ]; then
+    echo "ALERTE: Espace disque critique: ${DISK_USAGE}%" >> $LOG_FILE
+fi
+
+echo "Vérification terminée" >> $LOG_FILE
+echo "" >> $LOG_FILE
+            </div>
+
+            <div class="code-block">
+<span class="comment"># Rendre le script exécutable</span>
+<span class="command">sudo chmod +x /usr/local/bin/security-check.sh</span>
+
+<span class="comment"># Programmer l'exécution quotidienne</span>
+<span class="command">sudo crontab -e</span>
+
+<span class="comment"># Ajouter cette ligne :</span>
+0 6 * * * /usr/local/bin/security-check.sh
+            </div>
+        </div>
+
+        <div class="section">
+            <h2><span class="icon">🔐</span>8. Chiffrement et sécurité des données</h2>
+            
+            <h3>Chiffrement des communications</h3>
+            <p>Le chiffrement des données en transit et au repos est essentiel pour maintenir la confidentialité.</p>
+            
+            <h3>Configuration de certificats SSL/TLS</h3>
+            <div class="code-block">
+<span class="comment"># Générer une clé privée</span>
+<span class="command">sudo openssl genrsa -out /etc/ssl/private/server.key 4096</span>
+
+<span class="comment"># Générer une demande de certificat</span>
+<span class="command">sudo openssl req -new -key /etc/ssl/private/server.key -out /etc/ssl/certs/server.csr</span>
+
+<span class="comment"># Générer un certificat auto-signé (pour test)</span>
+<span class="command">sudo openssl x509 -req -days 365 -in /etc/ssl/certs/server.csr -signkey /etc/ssl/private/server.key -out /etc/ssl/certs/server.crt</span>
+
+<span class="comment"># Définir les bonnes permissions</span>
+<span class="command">sudo chmod 600 /etc/ssl/private/server.key</span>
+<span class="command">sudo chmod 644 /etc/ssl/certs/server.crt</span>
+            </div>
+
+            <h3>Chiffrement de fichiers avec GPG</h3>
+            <div class="code-block">
+<span class="comment"># Générer une paire de clés GPG</span>
+<span class="command">gpg --gen-key</span>
+
+<span class="comment"># Lister les clés</span>
+<span class="command">gpg --list-keys</span>
+
+<span class="comment"># Chiffrer un fichier</span>
+<span class="command">gpg --encrypt --recipient utilisateur@exemple.com fichier.txt</span>
+
+<span class="comment"># Déchiffrer un fichier</span>
+<span class="command">gpg --decrypt fichier.txt.gpg > fichier.txt</span>
+
+<span class="comment"># Chiffrer avec mot de passe symétrique</span>
+<span class="command">gpg --symmetric fichier.txt</span>
+            </div>
+
+            <h3>Chiffrement de partitions avec LUKS</h3>
+            <div class="code-block">
+<span class="comment"># Installer les outils nécessaires</span>
+<span class="command">sudo apt-get install cryptsetup</span>
+
+<span class="comment"># Créer une partition chiffrée</span>
+<span class="command">sudo cryptsetup luksFormat /dev/sdb1</span>
+
+<span class="comment"># Ouvrir la partition chiffrée</span>
+<span class="command">sudo cryptsetup luksOpen /dev/sdb1 encrypted_disk</span>
+
+<span class="comment"># Formater la partition</span>
+<span class="command">sudo mkfs.ext4 /dev/mapper/encrypted_disk</span>
+
+<span class="comment"># Monter la partition</span>
+<span class="command">sudo mount /dev/mapper/encrypted_disk /mnt/encrypted</span>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2><span class="icon">📋</span>9. Checklist de sécurité de base</h2>
+            
+            <div class="objectives">
+                <h3>🔍 Audit initial du système</h3>
+                <ul>
+                    <li>Inventaire des utilisateurs et groupes</li>
+                    <li>Liste des services actifs et ports ouverts</li>
+                    <li>Vérification des permissions des fichiers sensibles</li>
+                    <li>Analyse des processus en cours d'exécution</li>
+                    <li>Vérification de l'espace disque et des montages</li>
+                </ul>
+            </div>
+
+            <div class="objectives">
+                <h3>👥 Gestion des accès</h3>
+                <ul>
+                    <li>Supprimer ou désactiver les comptes inutiles</li>
+                    <li>Configurer des politiques de mots de passe robustes</li>
+                    <li>Implémenter sudo avec le principe de moindre privilège</li>
+                    <li>Configurer l'expiration des comptes et mots de passe</li>
+                    <li>Mettre en place l'authentification par clés SSH</li>
+                </ul>
+            </div>
+
+            <div class="objectives">
+                <h3>⚙️ Durcissement des services</h3>
+                <ul>
+                    <li>Désactiver les services inutiles</li>
+                    <li>Changer les ports par défaut (SSH, etc.)</li>
+                    <li>Configurer des bannières d'avertissement</li>
+                    <li>Limiter les connexions simultanées</li>
+                    <li>Configurer les timeouts de session</li>
+                </ul>
+            </div>
+
+            <div class="objectives">
+                <h3>📊 Surveillance et logging</h3>
+                <ul>
+                    <li>Configurer la centralisation des logs</li>
+                    <li>Mettre en place la rotation des logs</li>
+                    <li>Installer et configurer fail2ban</li>
+                    <li>Créer des scripts de surveillance automatisée</li>
+                    <li>Configurer des alertes pour les événements critiques</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2><span class="icon">🧪</span>10. Travaux pratiques</h2>
+            
+            <div class="exercise">
+                <h4>💻 TP 1 : Audit de sécurité complet</h4>
+                <p><strong>Objectif :</strong> Réaliser un audit de sécurité d'un système Linux</p>
+                <ol>
+                    <li>Créer un script d'audit qui vérifie :
+                        <ul>
+                            <li>Les utilisateurs sans mot de passe</li>
+                            <li>Les fichiers avec permissions 777</li>
+                            <li>Les services non nécessaires actifs</li>
+                            <li>Les ports ouverts</li>
+                        </ul>
+                    </li>
+                    <li>Générer un rapport d'audit au format HTML</li>
+                    <li>Proposer des recommandations de sécurisation</li>
+                </ol>
+            </div>
+
+            <div class="exercise">
+                <h4>🔐 TP 2 : Configuration sécurisée d'un serveur web</h4>
+                <p><strong>Objectif :</strong> Sécuriser une installation Apache/Nginx</p>
+                <ol>
+                    <li>Installer Apache ou Nginx</li>
+                    <li>Créer un utilisateur dédié pour l'administration web</li>
+                    <li>Configurer sudo pour cet utilisateur</li>
+                    <li>Mettre en place SSL/TLS avec un certificat auto-signé</li>
+                    <li>Configurer fail2ban pour protéger contre les attaques</li>
+                    <li>Créer un script de surveillance des logs web</li>
+                </ol>
+            </div>
+
+            <div class="exercise">
+                <h4>🛡️ TP 3 : Simulation d'incident de sécurité</h4>
+                <p><strong>Objectif :</strong> Détecter et répondre à une tentative d'intrusion</p>
+                <ol>
+                    <li>Configurer un environnement de test avec fail2ban</li>
+                    <li>Simuler des tentatives de connexion SSH échouées</li>
+                    <li>Analyser les logs pour identifier l'attaque</li>
+                    <li>Vérifier que fail2ban a bien banni l'adresse IP</li>
+                    <li>Créer une procédure de réponse à incident</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2><span class="icon">📚</span>11. Ressources et documentation</h2>
+            
+            <h3>Documentation officielle</h3>
+            <ul>
+                <li><strong>Manuel sudo :</strong> <code>man sudo</code>, <code>man sudoers</code></li>
+                <li><strong>Pages man de sécurité :</strong> <code>man 5 passwd</code>, <code>man 5 shadow</code></li>
+                <li><strong>Documentation PAM :</strong> <code>man pam</code>, <code>man pam_pwquality</code></li>
+                <li><strong>SSH :</strong> <code>man sshd_config</code>, <code>man ssh_config</code></li>
+            </ul>
+
+            <h3>Fichiers de configuration importants</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Fichier</th>
+                            <th>Description</th>
+                            <th>Commande d'édition sécurisée</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>/etc/sudoers</td>
+                            <td>Configuration sudo</td>
+                            <td>sudo visudo</td>
+                        </tr>
+                        <tr>
+                            <td>/etc/ssh/sshd_config</td>
+                            <td>Configuration serveur SSH</td>
+                            <td>sudo nano /etc/ssh/sshd_config</td>
+                        </tr>
+                        <tr>
+                            <td>/etc/security/pwquality.conf</td>
+                            <td>Politique des mots de passe</td>
+                            <td>sudo nano /etc/security/pwquality.conf</td>
+                        </tr>
+                        <tr>
+                            <td>/etc/fail2ban/jail.local</td>
+                            <td>Configuration fail2ban</td>
+                            <td>sudo nano /etc/fail2ban/jail.local</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>Commandes essentielles à retenir</h3>
+            <div class="code-block">
+<span class="comment"># Audit et surveillance</span>
+<span class="command">sudo ss -tlnp</span>                    <span class="comment"># Ports en écoute</span>
+<span class="command">sudo systemctl list-units --failed</span> <span class="comment"># Services en échec</span>
+<span class="command">last -n 20</span>                       <span class="comment"># Dernières connexions</span>
+<span class="command">sudo grep "Failed" /var/log/auth.log</span> <span class="comment"># Échecs d'authentification</span>
+
+<span class="comment"># Gestion des utilisateurs</span>
+<span class="command">sudo chage -l username</span>            <span class="comment"># Info expiration mot de passe</span>
+<span class="command">sudo passwd -S username</span>           <span class="comment"># Statut du mot de passe</span>
+<span class="command">sudo usermod -L username</span>          <span class="comment"># Verrouiller un compte</span>
+
+<span class="comment"># Permissions et sécurité</span>
+<span class="command">sudo find / -perm 777 -type f 2>/dev/null</span> <span class="comment"># Fichiers avec permissions 777</span>
+<span class="command">sudo find / -nouser -o -nogroup 2>/dev/null</span> <span class="comment"># Fichiers orphelins</span>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2><span class="icon">🎯</span>12. Évaluation et certification</h2>
+            
+            <div class="objectives">
+                <h3>Critères d'évaluation</h3>
+                <ul>
+                    <li><strong>Compréhension théorique (30%) :</strong> Principes de sécurité, concepts clés</li>
+                    <li><strong>Configuration pratique (40%) :</strong> sudo, SSH, politiques de mots de passe</li>
+                    <li><strong>Surveillance et détection (20%) :</strong> Logs, fail2ban, scripts de surveillance</li>
+                    <li><strong>Résolution de problèmes (10%) :</strong> Diagnostic et correction d'incidents</li>
+                </ul>
+            </div>
+
+            <div class="tip">
+                <strong>💡 Conseils pour l'examen :</strong>
+                <ul>
+                    <li>Pratiquez régulièrement les commandes de base</li>
+                    <li>Comprenez la logique derrière chaque mesure de sécurité</li>
+                    <li>Sachez interpréter les logs de sécurité</li>
+                    <li>Maîtrisez la configuration de sudo et SSH</li>
+                    <li>Préparez-vous à justifier vos choix de sécurisation</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p><strong>Formation Administration Système Linux - Jour 17</strong></p>
+            <p>Formateur : Jean Tene | © 2025 - Tous droits réservés</p>
+            <p>📧 Contact : formation@exemple.com | 🌐 Site web : www.formation-linux.com</p>
+        </div>
+    </div>
+</body>
+</html>

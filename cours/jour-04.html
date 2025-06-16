@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jour 04 - Terminal et commandes de base</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        h2 {
+            color: #34495e;
+            margin: 30px 0 15px 0;
+            padding: 10px 0;
+            border-bottom: 3px solid #667eea;
+            font-size: 1.8em;
+        }
+        
+        h3 {
+            color: #2c3e50;
+            margin: 25px 0 10px 0;
+            font-size: 1.4em;
+        }
+        
+        h4 {
+            color: #34495e;
+            margin: 20px 0 10px 0;
+            font-size: 1.2em;
+        }
+        
+        .objectives {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .prerequisites {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .code-block {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+        
+        .code-block::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 10px 10px 0 0;
+        }
+        
+        .command {
+            color: #3498db;
+            font-weight: bold;
+        }
+        
+        .option {
+            color: #e74c3c;
+        }
+        
+        .argument {
+            color: #2ecc71;
+        }
+        
+        .comment {
+            color: #95a5a6;
+            font-style: italic;
+        }
+        
+        .warning {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ffa500 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
+        }
+        
+        .info-box {
+            background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            box-shadow: 0 5px 15px rgba(116, 185, 255, 0.3);
+        }
+        
+        .file-structure {
+            background: #f8f9fa;
+            padding: 20px;
+            border-left: 5px solid #667eea;
+            margin: 15px 0;
+            border-radius: 0 10px 10px 0;
+        }
+        
+        .exercise {
+            background: linear-gradient(135deg, #55a3ff 0%, #003d82 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            box-shadow: 0 10px 25px rgba(85, 163, 255, 0.3);
+        }
+        
+        .exercise h3 {
+            color: white;
+            margin-top: 0;
+        }
+        
+        ul, ol {
+            padding-left: 30px;
+            margin: 10px 0;
+        }
+        
+        li {
+            margin: 5px 0;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        th {
+            background: #667eea;
+            color: white;
+            padding: 15px;
+            text-align: left;
+        }
+        
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .summary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 30px 0;
+            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.3);
+        }
+        
+        .resources {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            box-shadow: 0 10px 25px rgba(252, 182, 159, 0.3);
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            h2 {
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Jour 04 - Terminal et commandes de base</h1>
+        
+        <div class="objectives">
+            <h2>Objectifs d'apprentissage</h2>
+            <p>À la fin de cette journée, les participants seront capables de :</p>
+            <ul>
+                <li>Comprendre le concept de terminal et de shell</li>
+                <li>Utiliser les commandes de base pour naviguer dans le système de fichiers</li>
+                <li>Manipuler des fichiers et des répertoires</li>
+                <li>Exécuter des commandes avec des options et des arguments</li>
+                <li>Comprendre le système d'aide et de documentation intégré</li>
+            </ul>
+        </div>
+        
+        <div class="prerequisites">
+            <h2>Prérequis</h2>
+            <ul>
+                <li>Connaissances de base sur Linux (Jours 1-3)</li>
+                <li>Installation fonctionnelle d'une distribution Linux</li>
+            </ul>
+        </div>
+        
+        <h2>1. Introduction au terminal Linux</h2>
+        
+        <h3>1.1 Qu'est-ce que le terminal ?</h3>
+        <ul>
+            <li>Définition et histoire du terminal</li>
+            <li>Terminal physique vs émulateur de terminal</li>
+            <li>L'importance du terminal dans l'administration Linux</li>
+            <li>Applications courantes des émulateurs de terminal selon les environnements de bureau</li>
+        </ul>
+        
+        <h3>1.2 Qu'est-ce que le shell ?</h3>
+        <ul>
+            <li>Différence entre terminal et shell</li>
+            <li>Rôle du shell : interpréteur de commandes</li>
+        </ul>
+        
+        <h4>Shells courants :</h4>
+        <ul>
+            <li><strong>Bash</strong> (Bourne Again SHell) - par défaut sur la plupart des distributions</li>
+            <li><strong>Zsh</strong> (Z Shell) - features avancées, par défaut sur macOS récent</li>
+            <li><strong>Fish</strong> - shell convivial et intuitif</li>
+            <li>sh, ksh, dash, etc.</li>
+        </ul>
+        
+        <div class="info-box">
+            <strong>Comment identifier votre shell actuel :</strong>
+            <div class="code-block">
+                <span class="command">echo</span> <span class="argument">$SHELL</span>
+            </div>
+        </div>
+        
+        <h3>1.3 Structure d'une commande dans le terminal</h3>
+        <div class="code-block">
+            <span class="command">commande</span> <span class="option">[options]</span> <span class="argument">[arguments]</span>
+        </div>
+        
+        <ul>
+            <li><strong>Commande :</strong> programme ou commande interne du shell à exécuter</li>
+            <li><strong>Options :</strong> modifient le comportement de la commande
+                <ul>
+                    <li>Format court : préfixé d'un tiret simple (-a, -l)</li>
+                    <li>Format long : préfixé de deux tirets (--all, --list)</li>
+                </ul>
+            </li>
+            <li><strong>Arguments :</strong> cibles ou objets sur lesquels la commande agit</li>
+        </ul>
+        
+        <h4>Exemple :</h4>
+        <div class="code-block">
+            <span class="command">ls</span> <span class="option">-la</span> <span class="argument">/home</span><br>
+            <span class="comment"># ls = commande</span><br>
+            <span class="comment"># -la = options (-l et -a combinées)</span><br>
+            <span class="comment"># /home = argument</span>
+        </div>
+        
+        <h2>2. Naviguer dans le système de fichiers</h2>
+        
+        <h3>2.1 Structure des répertoires Linux</h3>
+        <p>Hiérarchie du système de fichiers (FHS - Filesystem Hierarchy Standard)</p>
+        
+        <div class="file-structure">
+            <h4>Répertoires principaux et leur rôle :</h4>
+            <ul>
+                <li><strong>/</strong> : racine du système</li>
+                <li><strong>/home</strong> : répertoires personnels des utilisateurs</li>
+                <li><strong>/etc</strong> : fichiers de configuration</li>
+                <li><strong>/var</strong> : données variables (logs, mails, etc.)</li>
+                <li><strong>/usr</strong> : programmes et données en lecture seule</li>
+                <li><strong>/bin, /sbin</strong> : commandes binaires essentielles</li>
+                <li><strong>/lib</strong> : bibliothèques partagées</li>
+                <li><strong>/tmp</strong> : fichiers temporaires</li>
+                <li><strong>/boot</strong> : fichiers de démarrage</li>
+                <li><strong>/dev</strong> : périphériques</li>
+                <li><strong>/proc, /sys</strong> : systèmes de fichiers virtuels (informations du noyau)</li>
+                <li><strong>/mnt, /media</strong> : points de montage</li>
+            </ul>
+        </div>
+        
+        <h3>2.2 Commandes de navigation de base</h3>
+        
+        <h4>pwd (Print Working Directory)</h4>
+        <p>Affiche le répertoire de travail actuel</p>
+        <div class="code-block">
+            <span class="command">pwd</span><br>
+            <span class="comment"># Résultat : /home/utilisateur</span>
+        </div>
+        
+        <h4>ls (List)</h4>
+        <p>Lister les fichiers et répertoires</p>
+        <div class="code-block">
+            <span class="command">ls</span> <span class="comment"># liste basique</span><br>
+            <span class="command">ls</span> <span class="option">-l</span> <span class="comment"># format long (détails)</span><br>
+            <span class="command">ls</span> <span class="option">-a</span> <span class="comment"># montre les fichiers cachés (commençant par .)</span><br>
+            <span class="command">ls</span> <span class="option">-la</span> <span class="comment"># combinaison de -l et -a</span><br>
+            <span class="command">ls</span> <span class="option">-lh</span> <span class="comment"># format lisible (tailles en Ko, Mo, etc.)</span>
+        </div>
+        
+        <div class="info-box">
+            <h4>Format long (ls -l) expliqué :</h4>
+            <div class="code-block">
+                drwxr-xr-x 2 utilisateur groupe 4096 May 10 14:30 Documents
+            </div>
+            <ul>
+                <li><strong>d</strong> : type (d=répertoire, -=fichier, l=lien symbolique)</li>
+                <li><strong>rwxr-xr-x</strong> : permissions</li>
+                <li><strong>2</strong> : nombre de liens durs</li>
+                <li><strong>utilisateur</strong> : propriétaire</li>
+                <li><strong>groupe</strong> : groupe propriétaire</li>
+                <li><strong>4096</strong> : taille (en octets)</li>
+                <li><strong>May 10 14:30</strong> : date de dernière modification</li>
+                <li><strong>Documents</strong> : nom</li>
+            </ul>
+        </div>
+        
+        <h4>cd (Change Directory)</h4>
+        <p>Changer de répertoire</p>
+        <div class="code-block">
+            <span class="command">cd</span> <span class="argument">/chemin/absolu</span> <span class="comment"># chemin depuis la racine</span><br>
+            <span class="command">cd</span> <span class="argument">chemin/relatif</span> <span class="comment"># chemin depuis la position actuelle</span><br>
+            <span class="command">cd</span> <span class="argument">~</span> <span class="comment"># répertoire personnel</span><br>
+            <span class="command">cd</span> <span class="argument">..</span> <span class="comment"># répertoire parent</span><br>
+            <span class="command">cd</span> <span class="argument">-</span> <span class="comment"># répertoire précédent</span>
+        </div>
+        
+        <h3>2.3 Chemins absolus et relatifs</h3>
+        <ul>
+            <li><strong>Chemin absolu :</strong> commence par /, indépendant de la position actuelle<br>
+                Exemple : /home/utilisateur/Documents</li>
+            <li><strong>Chemin relatif :</strong> relatif au répertoire de travail actuel<br>
+                Exemple : Documents (depuis /home/utilisateur)</li>
+        </ul>
+        
+        <div class="info-box">
+            <h4>Raccourcis :</h4>
+            <ul>
+                <li><strong>.</strong> : répertoire courant</li>
+                <li><strong>..</strong> : répertoire parent</li>
+                <li><strong>~</strong> : répertoire personnel de l'utilisateur</li>
+            </ul>
+        </div>
+        
+        <h2>3. Manipulation de fichiers et répertoires</h2>
+        
+        <h3>3.1 Création et suppression de répertoires</h3>
+        
+        <h4>mkdir (Make Directory)</h4>
+        <div class="code-block">
+            <span class="command">mkdir</span> <span class="argument">dossier</span> <span class="comment"># crée un seul répertoire</span><br>
+            <span class="command">mkdir</span> <span class="option">-p</span> <span class="argument">parent/enfant/petit</span> <span class="comment"># crée des répertoires imbriqués</span>
+        </div>
+        
+        <h4>rmdir (Remove Directory)</h4>
+        <div class="code-block">
+            <span class="command">rmdir</span> <span class="argument">dossier</span> <span class="comment"># supprime un répertoire (s'il est vide)</span>
+        </div>
+        
+        <h3>3.2 Création, copie et déplacement de fichiers</h3>
+        
+        <h4>touch</h4>
+        <div class="code-block">
+            <span class="command">touch</span> <span class="argument">fichier.txt</span> <span class="comment"># crée un fichier vide ou met à jour l'horodatage</span>
+        </div>
+        
+        <h4>cp (Copy)</h4>
+        <div class="code-block">
+            <span class="command">cp</span> <span class="argument">source destination</span> <span class="comment"># copie un fichier</span><br>
+            <span class="command">cp</span> <span class="option">-r</span> <span class="argument">source destination</span> <span class="comment"># copie récursive (pour répertoires)</span><br>
+            <span class="command">cp</span> <span class="option">-a</span> <span class="argument">source destination</span> <span class="comment"># préserve les attributs lors de la copie</span>
+        </div>
+        
+        <h4>mv (Move)</h4>
+        <div class="code-block">
+            <span class="command">mv</span> <span class="argument">ancien nouveau</span> <span class="comment"># renomme un fichier/répertoire</span><br>
+            <span class="command">mv</span> <span class="argument">fichier /chemin/destination</span> <span class="comment"># déplace un fichier</span><br>
+            <span class="command">mv</span> <span class="argument">dossier/* destination/</span> <span class="comment"># déplace le contenu d'un dossier</span>
+        </div>
+        
+        <h3>3.3 Suppression de fichiers</h3>
+        
+        <h4>rm (Remove)</h4>
+        <div class="code-block">
+            <span class="command">rm</span> <span class="argument">fichier</span> <span class="comment"># supprime un fichier</span><br>
+            <span class="command">rm</span> <span class="option">-f</span> <span class="argument">fichier</span> <span class="comment"># force la suppression sans confirmation</span><br>
+            <span class="command">rm</span> <span class="option">-r</span> <span class="argument">dossier</span> <span class="comment"># suppression récursive (pour répertoires)</span><br>
+            <span class="command">rm</span> <span class="option">-rf</span> <span class="argument">dossier</span> <span class="comment"># suppression récursive forcée</span>
+        </div>
+        
+        <div class="warning">
+            ⚠️ Attention : rm -rf est dangereux, surtout avec des chemins absolus ou des jokers !
+        </div>
+        
+        <h3>3.4 Visualisation du contenu des fichiers</h3>
+        
+        <h4>cat (Concatenate)</h4>
+        <div class="code-block">
+            <span class="command">cat</span> <span class="argument">fichier.txt</span> <span class="comment"># affiche le contenu</span><br>
+            <span class="command">cat</span> <span class="option">-n</span> <span class="argument">fichier.txt</span> <span class="comment"># affiche avec numéros de ligne</span>
+        </div>
+        
+        <h4>less</h4>
+        <div class="code-block">
+            <span class="command">less</span> <span class="argument">fichier.txt</span> <span class="comment"># navigation avec flèches, Page Up/Down</span>
+        </div>
+        
+        <div class="info-box">
+            <h4>Commandes utiles dans less :</h4>
+            <ul>
+                <li><strong>q</strong> : quitter</li>
+                <li><strong>/texte</strong> : rechercher</li>
+                <li><strong>n</strong> : occurrence suivante</li>
+                <li><strong>N</strong> : occurrence précédente</li>
+            </ul>
+        </div>
+        
+        <h4>head et tail</h4>
+        <div class="code-block">
+            <span class="command">head</span> <span class="argument">fichier.txt</span> <span class="comment"># affiche les 10 premières lignes</span><br>
+            <span class="command">head</span> <span class="option">-n 20</span> <span class="argument">fichier.txt</span> <span class="comment"># affiche les 20 premières lignes</span><br>
+            <span class="command">tail</span> <span class="argument">fichier.txt</span> <span class="comment"># affiche les 10 dernières lignes</span><br>
+            <span class="command">tail</span> <span class="option">-n 20</span> <span class="argument">fichier.txt</span> <span class="comment"># affiche les 20 dernières lignes</span><br>
+            <span class="command">tail</span> <span class="option">-f</span> <span class="argument">fichier.log</span> <span class="comment"># suit l'évolution du fichier en temps réel</span>
+        </div>
+        
+        <h2>4. Commandes d'information système</h2>
+        
+        <h3>4.1 Informations sur le système</h3>
+        
+        <h4>uname</h4>
+        <div class="code-block">
+            <span class="command">uname</span> <span class="option">-a</span> <span class="comment"># toutes les informations</span><br>
+            <span class="command">uname</span> <span class="option">-r</span> <span class="comment"># version du noyau</span>
+        </div>
+        
+        <h4>hostname</h4>
+        <div class="code-block">
+            <span class="command">hostname</span> <span class="comment"># affiche le nom d'hôte</span>
+        </div>
+        
+        <h4>date</h4>
+        <div class="code-block">
+            <span class="command">date</span> <span class="comment"># affiche la date et l'heure actuelles</span>
+        </div>
+        
+        <h3>4.2 Informations sur l'utilisation des ressources</h3>
+        
+        <h4>free</h4>
+        <div class="code-block">
+            <span class="command">free</span> <span class="comment"># utilisation de la mémoire</span><br>
+            <span class="command">free</span> <span class="option">-h</span> <span class="comment"># format "human-readable"</span>
+        </div>
+        
+        <h4>df (Disk Free)</h4>
+        <div class="code-block">
+            <span class="command">df</span> <span class="comment"># utilisation des systèmes de fichiers</span><br>
+            <span class="command">df</span> <span class="option">-h</span> <span class="comment"># format "human-readable"</span>
+        </div>
+        
+        <h4>du (Disk Usage)</h4>
+        <div class="code-block">
+            <span class="command">du</span> <span class="comment"># taille de tous les sous-répertoires</span><br>
+            <span class="command">du</span> <span class="option">-h</span> <span class="comment"># format "human-readable"</span><br>
+            <span class="command">du</span> <span class="option">-sh</span> <span class="argument">*/</span> <span class="comment"># taille des sous-répertoires du répertoire courant</span>
+        </div>
+        
+        <h4>top et htop</h4>
+        <div class="code-block">
+            <span class="command">top</span> <span class="comment"># vue dynamique des processus</span><br>
+            <span class="command">htop</span> <span class="comment"># version améliorée de top (installation peut être nécessaire)</span>
+        </div>
+        
+        <h2>5. Recherche et manipulation de texte</h2>
+        
+        <h3>5.1 Recherche de fichiers</h3>
+        
+        <h4>find</h4>
+        <div class="code-block">
+            <span class="command">find</span> <span class="argument">/chemin</span> <span class="option">-name</span> <span class="argument">"modèle"</span> <span class="comment"># recherche par nom</span><br>
+            <span class="command">find</span> <span class="argument">/home</span> <span class="option">-name</span> <span class="argument">"*.txt"</span> <span class="comment"># recherche de fichiers .txt dans /home</span><br>
+            <span class="command">find</span> <span class="argument">/var</span> <span class="option">-type f -size +100M</span> <span class="comment"># fichiers de plus de 100 Mo</span><br>
+            <span class="command">find</span> <span class="argument">/tmp</span> <span class="option">-mtime -7</span> <span class="comment"># fichiers modifiés dans les 7 derniers jours</span>
+        </div>
+        
+        <h4>locate</h4>
+        <div class="code-block">
+            <span class="command">locate</span> <span class="argument">fichier.txt</span> <span class="comment"># recherche rapide</span><br>
+            <span class="command">sudo updatedb</span> <span class="comment"># mise à jour de la base de données</span>
+        </div>
+        
+        <h3>5.2 Recherche dans le contenu des fichiers</h3>
+        
+        <h4>grep</h4>
+        <div class="code-block">
+            <span class="command">grep</span> <span class="argument">"motif" fichier</span> <span class="comment"># recherche simple</span><br>
+            <span class="command">grep</span> <span class="option">-i</span> <span class="argument">"motif" fichier</span> <span class="comment"># insensible à la casse</span><br>
+            <span class="command">grep</span> <span class="option">-r</span> <span class="argument">"motif" /chemin</span> <span class="comment"># recherche récursive</span><br>
+            <span class="command">grep</span> <span class="option">-v</span> <span class="argument">"motif" fichier</span> <span class="comment"># inverse (lignes ne contenant PAS le motif)</span><br>
+            <span class="command">grep</span> <span class="option">-n</span> <span class="argument">"motif" fichier</span> <span class="comment"># affiche les numéros de ligne</span>
+        </div>
+        
+        <h3>5.3 Redirections et pipelines</h3>
+        
+        <h4>Redirection de sortie</h4>
+        <div class="code-block">
+            <span class="command">commande</span> <span class="option">></span> <span class="argument">fichier</span> <span class="comment"># redirige et écrase le fichier</span><br>
+            <span class="command">commande</span> <span class="option">>></span> <span class="argument">fichier</span> <span class="comment"># redirige et ajoute à la fin du fichier</span>
+        </div>
+        
+        <h4>Redirection d'entrée</h4>
+        <div class="code-block">
+            <span class="command">commande</span> <span class="option"><</span> <span class="argument">fichier</span> <span class="comment"># utilise le fichier comme entrée</span>
+        </div>
+        
+        <h4>Redirection d'erreurs</h4>
+        <div class="code-block">
+            <span class="command">commande</span> <span class="option">2></span> <span class="argument">erreurs.log</span> <span class="comment"># redirige les erreurs vers un fichier</span><br>
+            <span class="command">commande</span> <span class="option">></span> <span class="argument">sortie.log</span> <span class="option">2>&1</span> <span class="comment"># redirige la sortie et les erreurs</span>
+        </div>
+        
+        <h4>Pipelines</h4>
+        <div class="code-block">
+            <span class="command">commande1</span> <span class="option">|</span> <span class="command">commande2</span> <span class="comment"># envoie la sortie de commande1 à l'entrée de commande2</span><br>
+            <span class="command">cat</span> <span class="argument">fichier</span> <span class="option">|</span> <span class="command">grep</span> <span class="argument">"motif"</span> <span class="comment"># filtre les lignes contenant "motif"</span><br>
+            <span class="command">ls</span> <span class="option">-la</span> <span class="option">|</span> <span class="command">less</span> <span class="comment"># affiche les résultats de ls page par page</span>
+        </div>
+        
+        <h2>6. Aide et documentation</h2>
+        
+        <h3>6.1 Manuels (man)</h3>
+        <div class="code-block">
+            <span class="command">man</span> <span class="argument">commande</span> <span class="comment"># affiche le manuel de la commande</span><br>
+            <span class="command">man</span> <span class="argument">5 passwd</span> <span class="comment"># manuel de la section 5 pour passwd</span>
+        </div>
+        
+        <div class="info-box">
+            <h4>Sections du manuel :</h4>
+            <ol>
+                <li>Programmes exécutables ou commandes shell</li>
+                <li>Appels système</li>
+                <li>Appels de bibliothèque</li>
+                <li>Fichiers spéciaux</li>
+                <li>Formats de fichier et conventions</li>
+                <li>Jeux</li>
+                <li>Divers</li>
+                <li>Commandes d'administration système</li>
+            </ol>
+        </div>
+        
+        <h3>6.2 Aide intégrée</h3>
+        <div class="code-block">
+            <span class="command">help</span> <span class="argument">cd</span> <span class="comment"># aide pour la commande interne cd</span><br>
+            <span class="command">ls</span> <span class="option">--help</span> <span class="comment"># affiche l'aide de ls</span>
+        </div>
+        
+        <h3>6.3 Info et recherche</h3>
+        <div class="code-block">
+            <span class="command">info</span> <span class="argument">commande</span> <span class="comment"># documentation info</span><br>
+            <span class="command">apropos</span> <span class="argument">"recherche de texte"</span> <span class="comment"># trouve des commandes liées à "recherche de texte"</span><br>
+            <span class="command">whatis</span> <span class="argument">ls</span> <span class="comment"># affiche une description courte de ls</span>
+        </div>
+        
+        <h2>7. Manipulation de base des permissions</h2>
+        
+        <h3>7.1 Comprendre les permissions Linux</h3>
+        
+        <div class="table-container">
+            <table>
+                <tr>
+                    <th>Type de permission</th>
+                    <th>Symbole</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td>Lecture</td>
+                    <td>r</td>
+                    <td>Permet de lire le contenu</td>
+                </tr>
+                <tr>
+                    <td>Écriture</td>
+                    <td>w</td>
+                    <td>Permet de modifier le contenu</td>
+                </tr>
+                <tr>
+                    <td>Exécution</td>
+                    <td>x</td>
+                    <td>Permet d'exécuter le fichier</td>
+                </tr>
+            </table>
+        </div>
+        
+        <div class="table-container">
+            <table>
+                <tr>
+                    <th>Catégorie d'utilisateur</th>
+                    <th>Symbole</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td>Propriétaire</td>
+                    <td>u</td>
+                    <td>Utilisateur propriétaire du fichier</td>
+                </tr>
+                <tr>
+                    <td>Groupe</td>
+                    <td>g</td>
+                    <td>Groupe propriétaire du fichier</td>
+                </tr>
+                <tr>
+                    <td>Autres</td>
+                    <td>o</td>
+                    <td>Tous les autres utilisateurs</td>
+                </tr>
+            </table>
+        </div>
+        
+        <h3>7.2 Commandes de gestion des permissions</h3>
+        
+        <h4>chmod (Change Mode)</h4>
+        <div class="code-block">
+            <span class="command">chmod</span> <span class="option">u+x</span> <span class="argument">fichier</span> <span class="comment"># ajoute l'exécution pour le propriétaire</span><br>
+            <span class="command">chmod</span> <span class="option">g-w</span> <span class="argument">fichier</span> <span class="comment"># retire l'écriture pour le groupe</span><br>
+            <span class="command">chmod</span> <span class="option">o=r</span> <span class="argument">fichier</span> <span class="comment"># définit les droits "autres" à lecture seule</span><br>
+            <span class="command">chmod</span> <span class="option">755</span> <span class="argument">fichier</span> <span class="comment"># définit rwx pour propriétaire, r-x pour groupe et autres</span>
+        </div>
+        
+        <h4>chown (Change Owner)</h4>
+        <div class="code-block">
+            <span class="command">sudo chown</span> <span class="argument">utilisateur fichier</span> <span class="comment"># change le propriétaire</span><br>
+            <span class="command">sudo chown</span> <span class="argument">utilisateur:groupe fichier</span> <span class="comment"># change propriétaire et groupe</span>
+        </div>
+        
+        <h4>chgrp (Change Group)</h4>
+        <div class="code-block">
+            <span class="command">sudo chgrp</span> <span class="argument">groupe fichier</span> <span class="comment"># change le groupe</span>
+        </div>
+        
+        <h3>7.3 Représentation numérique des permissions</h3>
+        
+        <div class="info-box">
+            <h4>Système octal :</h4>
+            <ul>
+                <li><strong>4</strong> = read (r)</li>
+                <li><strong>2</strong> = write (w)</li>
+                <li><strong>1</strong> = execute (x)</li>
+                <li><strong>0</strong> = aucun droit</li>
+            </ul>
+            
+            <h4>Exemples :</h4>
+            <ul>
+                <li><strong>chmod 755 fichier</strong> = rwxr-xr-x</li>
+                <li><strong>chmod 644 fichier</strong> = rw-r--r--</li>
+                <li><strong>chmod 700 fichier</strong> = rwx------</li>
+            </ul>
+        </div>
+        
+        <h2>Exercices pratiques</h2>
+        
+        <div class="exercise">
+            <h3>Exercice 1 : Navigation et manipulation de base</h3>
+            <ol>
+                <li>Ouvrez un terminal</li>
+                <li>Naviguez jusqu'à votre répertoire personnel (<code>cd ~</code>)</li>
+                <li>Créez un répertoire nommé <strong>exercices</strong></li>
+                <li>Entrez dans ce répertoire</li>
+                <li>Créez un fichier texte nommé <strong>notes.txt</strong> avec la commande <code>touch</code></li>
+                <li>Vérifiez qu'il existe avec <code>ls -l</code></li>
+                <li>Revenez au répertoire parent</li>
+                <li>Listez le contenu du répertoire <strong>exercices</strong> sans y entrer</li>
+            </ol>
+        </div>
+        
+        <div class="exercise">
+            <h3>Exercice 2 : Manipulation du contenu</h3>
+            <ol>
+                <li>Dans le répertoire <strong>exercices</strong>, créez un fichier <strong>liste.txt</strong> contenant une liste de tâches (utilisez nano ou un autre éditeur)</li>
+                <li>Affichez le contenu du fichier avec <code>cat</code></li>
+                <li>Faites une copie du fichier nommée <strong>liste_backup.txt</strong></li>
+                <li>Ajoutez une nouvelle tâche à la fin du fichier original en utilisant <code>>></code> (redirection)</li>
+                <li>Vérifiez les différences entre les deux fichiers</li>
+            </ol>
+        </div>
+        
+        <div class="exercise">
+            <h3>Exercice 3 : Recherche et filtrage</h3>
+            <ol>
+                <li>Créez un nouveau répertoire nommé <strong>recherche</strong></li>
+                <li>Dans ce répertoire, créez plusieurs fichiers texte avec différents contenus</li>
+                <li>Utilisez <code>grep</code> pour trouver tous les fichiers contenant un mot spécifique</li>
+                <li>Essayez des recherches plus complexes en combinant les commandes avec des pipelines</li>
+            </ol>
+        </div>
+        
+        <div class="exercise">
+            <h3>Exercice 4 : Permissions</h3>
+            <ol>
+                <li>Créez un fichier script simple nommé <strong>hello.sh</strong> contenant :
+                    <div class="code-block">
+                        #!/bin/bash<br>
+                        <span class="command">echo</span> <span class="argument">"Hello, Linux!"</span>
+                    </div>
+                </li>
+                <li>Essayez de l'exécuter directement (<code>./hello.sh</code>) et observez l'erreur</li>
+                <li>Changez les permissions pour le rendre exécutable</li>
+                <li>Exécutez-le à nouveau</li>
+            </ol>
+        </div>
+        
+        <div class="summary">
+            <h2>Résumé des points clés</h2>
+            <ul>
+                <li>Le terminal Linux offre un contrôle puissant et précis sur le système</li>
+                <li>Les commandes de base permettent de naviguer et manipuler les fichiers efficacement</li>
+                <li>Les redirections et pipelines permettent de combiner les commandes de manière puissante</li>
+                <li>Le système de permissions Linux contrôle l'accès aux fichiers et répertoires</li>
+                <li>La documentation intégrée (man, help, info) est une ressource essentielle</li>
+            </ul>
+        </div>
+        
+        <div class="resources">
+            <h2>Ressources supplémentaires</h2>
+            <ul>
+                <li><strong>The Linux Command Line</strong> (livre gratuit en ligne)</li>
+                <li><strong>Explainshell</strong> - Analyse détaillée des commandes shell</li>
+                <li><strong>Linux Journey</strong> - Tutoriels interactifs</li>
+                <li><strong>Cheat.sh</strong> - Référence rapide des commandes Linux</li>
+                <li><strong>Bash Guide for Beginners</strong></li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
